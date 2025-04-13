@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmotionAIL - 프리미엄 AI 서비스</title>
+  
+  <!-- 기본 스타일 -->
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html { height: 100%; font-family: 'Courier New', monospace; overflow-x: hidden; color: #333; }
+    
+    /* 헤더 네비게이션 */
+    header {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 200;
+      background: rgba(0,0,0,0.8); color: #fff; padding: 15px 20px;
+    }
+    header .nav-container { display: flex; justify-content: space-between; align-items: center; }
+    header nav a {
+      color: #fff; text-decoration: none; margin-left: 20px; font-size: 14px;
+    }
+    header nav a:hover { text-decoration: underline; }
+    
+    /* 히어로 섹션 */
+    .hero {
+      height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      text-align: center; 
+      position: relative;
+      z-index: 100;
+      padding: 0 20px;
+    }
+    .hero h1 {
+      font-size: 3rem; color: #fff; text-shadow: 0 0 10px #000;
+    }
+    .hero p { 
+      font-size: 1.2rem; color: #eee; margin-top: 20px; 
+      text-shadow: 0 0 5px #000;
+    }
+    /* 3D 캔버스 (배경) */
+    #canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+      display: block;
+    }
+    
+    /* 섹션 공통 */
+    section { padding: 80px 20px; }
+    .section-title { font-size: 2rem; margin-bottom: 20px; text-align: center; }
+    .content { max-width: 800px; margin: 0 auto; text-align: center; line-height: 1.6; }
+    
+    /* 가격 섹션 */
+    .pricing {
+      background: #f9f9f9;
+      border-top: 2px solid #ddd;
+      border-bottom: 2px solid #ddd;
+    }
+    .price-card {
+      border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 10px;
+      display: inline-block; vertical-align: top; width: 280px; background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .price-card h3 { margin-bottom: 10px; }
+    .price { font-size: 1.5rem; margin: 15px 0; }
+    .subscribe-btn {
+      padding: 10px 20px; font-size: 16px; background: #00cc66; color: #fff;
+      border: none; border-radius: 5px; cursor: pointer;
+    }
+    .subscribe-btn:hover { background: #00b25a; }
+    
+    /* FAQ */
+    .faq-item { margin-bottom: 20px; }
+    .faq-item h4 { font-size: 1.2rem; margin-bottom: 5px; }
+    .faq-item p { font-size: 1rem; color: #555; }
+    
+    /* 푸터 */
+    footer {
+      text-align: center; padding: 20px; background: #222; color: #fff;
+    }
+    
+    /* 반응형 */
+    @media (max-width: 768px) {
+      header .nav-container { flex-direction: column; }
+      header nav a { margin: 5px 0; }
+      .price-card { width: 90%; margin: 10px auto; }
+    }
+  </style>
+  
+  <!-- Three.js 라이브러리 (3D 배경용) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <!-- Stripe.js 라이브러리 (결제용) -->
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+
+  <!-- 3D 배경 캔버스 -->
+  <canvas id="canvas"></canvas>
+
+  <!-- 헤더 -->
+  <header>
+    <div class="nav-container">
+      <div class="logo"><strong>EmotionAIL</strong></div>
+      <nav>
+        <a href="#hero">소개</a>
+        <a href="#features">기능</a>
+        <a href="#pricing">가격</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contact">문의</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 히어로 섹션 -->
+  <section class="hero" id="hero">
+    <h1>EmotionAIL</h1>
+    <p>AI 기반 감정 인식, 이미지 생성, 음성 지원까지!<br>프리미엄 AI 서비스를 경험해보세요.</p>
+    <!-- 결제 버튼 (Stripe Checkout 링크 연결) -->
+    <br>
+    <button id="subscribe-button" class="subscribe-btn">프리미엄 구독하기</button>
+  </section>
+
+  <!-- 기능 소개 섹션 -->
+  <section id="features">
+    <div class="section-title">주요 기능</div>
+    <div class="content">
+      <p>EmotionAIL은 자연어 대화, 이미지 생성, 캘린더 관리, 음성 인식 등 다양한 AI 서비스를 제공합니다.<br>
+         사용자의 감정을 분석해 상황에 맞는 서비스를 제공하며, 직관적인 3D 인터페이스로 더욱 몰입감 있는 경험을 선사합니다.</p>
+    </div>
+  </section>
+
+  <!-- 가격 안내 섹션 -->
+  <section id="pricing" class="pricing">
+    <div class="section-title">가격</div>
+    <div class="content">
+      <div class="price-card">
+        <h3>주간 구독</h3>
+        <p class="price">16,000원 / 주</p>
+        <button class="subscribe-btn" onclick="subscribePlan('weekly')">주간 결제</button>
+      </div>
+      <div class="price-card">
+        <h3>월간 구독</h3>
+        <p class="price">23,000원 / 월</p>
+        <button class="subscribe-btn" onclick="subscribePlan('monthly')">월간 결제</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ 섹션 -->
+  <section id="faq">
+    <div class="section-title">자주 묻는 질문</div>
+    <div class="content">
+      <div class="faq-item">
+        <h4>어떤 결제 수단을 지원하나요?</h4>
+        <p>저희 EmotionAIL은 신용/체크 카드 결제를 지원합니다. (Visa, MasterCard, Amex 등)</p>
+      </div>
+      <div class="faq-item">
+        <h4>구독 해지는 어떻게 하나요?</h4>
+        <p>구독 해지는 마이페이지 또는 고객 지원을 통해 신청하실 수 있습니다.</p>
+      </div>
+      <div class="faq-item">
+        <h4>서비스 이용 중 문제가 발생하면 어떻게 하나요?</h4>
+        <p>문의사항은 아래 연락처를 통해 도움을 받으실 수 있습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 문의 섹션 -->
+  <section id="contact">
+    <div class="section-title">문의하기</div>
+    <div class="content">
+      <p>궁금한 점이나 지원이 필요하면, 아래 이메일로 연락주세요.</p>
+      <p><a href="mailto:rnjsjergus179@gmail.com" style="color: #00cc66;">rnjsjergus179@gmail.com</a></p>
+    </div>
+  </section>
+
+  <!-- 푸터 -->
+  <footer>
+    <p>&copy; 2025 EmotionAIL. All rights reserved.</p>
+  </footer>
+
+  <!-- 스크립트 -->
+  <script>
+    /***** 3D 배경 (간단한 별 애니메이션 예제) *****/
+    let scene, camera, renderer;
+    function init3D() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.position.z = 5;
+
+      // 별 파티클 생성
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [];
+      for (let i = 0; i < 1000; i++) {
+        vertices.push(
+          THREE.MathUtils.randFloatSpread(200), 
+          THREE.MathUtils.randFloatSpread(200), 
+          THREE.MathUtils.randFloatSpread(200)
+        );
+      }
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      const material = new THREE.PointsMaterial({ color: 0xffffff });
+      const stars = new THREE.Points(geometry, material);
+      scene.add(stars);
+    }
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      renderer.render(scene, camera);
+    }
+    init3D();
+    animate3D();
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    /***** Stripe 결제 버튼 처리 *****/
+    // Stripe 공개키, 실제 키로 교체할 것
+    const stripe = Stripe("pk_test_YourPublicKeyHere");
+    
+    // Node.js 백엔드 또는 서버리스 함수에서 생성된 Checkout Session URL로 리디렉션하는 방식 사용
+    function subscribePlan(plan) {
+      // 예: 구독 유형 ('weekly' 혹은 'monthly')에 따라 백엔드 호출
+      fetch("https://your-backend.com/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: plan })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert("결제 링크 생성 오류: " + data.error);
+        }
+      })
+      .catch(err => alert("네트워크 오류: " + err));
+    }
+    
+    // 메인 구독 버튼 (히어로 섹션)에도 월간 결제 예시 적용
+    document.getElementById("subscribe-button").addEventListener("click", () => {
+      subscribePlan("monthly");
+    });
+    
+    /***** 간단한 DevTools 감지 및 차단 (개발자 모드에서는 보안 강화) *****/
+    function isDevToolsOpen() {
+      if (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)) return false;
+      const threshold = 160;
+      const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+      const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+      return widthThreshold || heightThreshold;
+    }
+    function blockPage() {
+      document.body.innerHTML = "<h1>페이지가 차단되었습니다.</h1>";
+      document.body.style.backgroundColor = "black";
+      document.body.style.color = "white";
+      document.body.style.display = "flex";
+      document.body.style.justifyContent = "center";
+      document.body.style.alignItems = "center";
+      document.body.style.height = "100vh";
+      document.body.style.margin = "0";
+    }
+    setInterval(() => {
+      if (isDevToolsOpen()) { blockPage(); }
+    }, 1000);
+  </script>
+</body>
+</html>
