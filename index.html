@@ -222,13 +222,13 @@
     });
 
     /***** Stripe 결제 버튼 처리 *****/
-    // Stripe 공개키, 실제 키로 교체할 것
+    // Stripe 공개키 (실제 배포 시 실제 공개키로 교체)
     const stripe = Stripe("pk_test_YourPublicKeyHere");
     
-    // Node.js 백엔드 또는 서버리스 함수에서 생성된 Checkout Session URL로 리디렉션하는 방식 사용
+    // 백엔드에서 생성한 Checkout Session URL로 리디렉션하는 방식 사용
     function subscribePlan(plan) {
-      // 예: 구독 유형 ('weekly' 혹은 'monthly')에 따라 백엔드 호출
-      fetch("https://your-backend.com/create-checkout-session", {
+      // 구독 유형 ('weekly' 혹은 'monthly')에 따라 백엔드 호출
+      fetch("/create-checkout-session", {  // 필요에 따라 URL을 수정하세요.
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: plan })
@@ -244,7 +244,7 @@
       .catch(err => alert("네트워크 오류: " + err));
     }
     
-    // 메인 구독 버튼 (히어로 섹션)에도 월간 결제 예시 적용
+    // 메인 구독 버튼 (히어로 섹션)에 월간 결제 예시 적용
     document.getElementById("subscribe-button").addEventListener("click", () => {
       subscribePlan("monthly");
     });
@@ -272,4 +272,4 @@
     }, 1000);
   </script>
 </body>
-</html>
+    </html>
