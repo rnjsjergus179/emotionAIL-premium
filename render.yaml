@@ -1,5 +1,6 @@
 services:
   - type: web
-    name: emotionail-premium
-    env: static
-    staticPublishPath: .
+    name: emotionail-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node index.js
