@@ -1,99 +1,47 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>emotionAIL 공식 홈페이지</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Three.js 라이브러리 (3D 데모를 위해) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
-    /* 기본 리셋 및 전역 스타일 */
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #333;
-      line-height: 1.6;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; font-family: Arial, sans-serif; overflow: hidden; }
+    
+    /* HUD 스타일 */
+    #right-hud, #left-hud, #hud-3 {
+      position: fixed;
+      padding: 1%;
+      background: rgba(255,255,255,0.8);
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 20;
     }
-    header {
-      background: linear-gradient(45deg, #6a11cb, #2575fc);
-      color: #fff;
-      padding: 1rem;
-      text-align: center;
+
+    /* 채팅창 */
+    #right-hud {
+      top: 10%;
+      right: 1%;
+      width: 20%;
     }
-    header h1 {
-      margin: 0;
-      font-size: 2.5rem;
+    #region-select { width: 100%; padding: 5px; font-size: 14px; margin-bottom: 10px; }
+    #chat-log { display: none; height: 100px; overflow-y: scroll; border: 1px solid #ccc; padding: 5px; margin-top: 10px; border-radius: 3px; background: #fff; }
+    #chat-input-area { display: flex; margin-top: 10px; }
+    #chat-input { flex: 1; padding: 5px; font-size: 14px; }
+
+    /* 캘린더 */
+    #left-hud {
+      top: 10%;
+      left: 1%;
+      width: 20%;
+      max-height: 80vh;
+      overflow-y: auto;
     }
-    header p {
-      margin: 5px 0 0;
-      font-size: 1.2rem;
-    }
-    nav {
-      background: #333;
-    }
-    nav ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    nav li {
-      margin: 0 15px;
-    }
-    nav a {
-      color: #fff;
-      text-decoration: none;
-      padding: 15px;
-      display: block;
-      transition: background 0.3s;
-    }
-    nav a:hover {
-      background: #444;
-    }
-    .container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .section {
-      margin: 50px 0;
-    }
-    .section h2 {
-      font-size: 2rem;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    /* 3D 데모 영역 스타일 */
-    #three-canvas {
-      width: 100%;
-      height: 500px;
-      background: #000;
-      border: 2px solid #ccc;
-    }
-    /* 기능 섹션 스타일 */
-    .features {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-    }
-    .feature {
-      flex: 1 1 calc(33% - 20px);
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      text-align: center;
-      min-width: 250px;
-    }
-    .feature h3 {
-      margin-top: 0;
-      font-size: 1.5rem;
-    }
-    /* 요금제 섹션 스타일 */
+    #calendar-container { margin-top: 10px; }
+    #calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    #month-year-label { font-weight: bold; font-size: 14px; }
+
+    /* 요금제 안내 */
     .pricing-plans {
       display: flex;
       flex-wrap: wrap;
@@ -101,7 +49,6 @@
       justify-content: center;
     }
     .plan {
-      flex: 1 1 calc(50% - 20px);
       background: #fff;
       padding: 20px;
       border-radius: 8px;
@@ -109,209 +56,162 @@
       text-align: center;
       min-width: 250px;
     }
-    .plan h3 {
-      margin-top: 0;
-      font-size: 1.5rem;
+    .plan h3 { margin-top: 0; font-size: 1.5rem; }
+
+    /* 기타 스타일 */
+    #speech-bubble {
+      position: fixed;
+      background: white;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      display: none;
+      z-index: 30;
+      white-space: pre-line;
+      pointer-events: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    /* 문의 양식 스타일 */
-    form {
-      max-width: 600px;
-      margin: 0 auto;
+
+    #version-select {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      z-index: 50;
     }
-    form label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
+    #version-select select {
+      padding: 5px;
+      font-size: 12px;
     }
-    form input[type="text"],
-    form input[type="email"],
-    form textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    form button {
-      background: #2575fc;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    form button:hover {
-      background: #1a5bb8;
-    }
-    /* 푸터 스타일 */
-    footer {
-      background: #333;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
-    /* 반응형 디자인 */
-    @media (max-width: 768px) {
-      .features, .pricing-plans {
-        flex-direction: column;
-        align-items: center;
-      }
-      .feature, .plan {
-        flex: 1 1 100%;
-      }
+
+    @media (max-width: 480px) {
+      #right-hud, #left-hud, #hud-3 { width: 90%; left: 5%; right: 5%; top: 5%; }
     }
   </style>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  
+  <script>
+    document.addEventListener("contextmenu", event => event.preventDefault());
+    let blockUntil = 0;
+    let danceInterval;
+    let currentCity = "서울"; // 한국어 지역명
+    let currentWeather = "";
+    
+    // 요금제 선택
+    function showPricingPlans() {
+      alert("월 구독 23,000원 / 주간 구독 16,000원");
+    }
+
+    document.addEventListener("copy", function(e) {
+      e.preventDefault();
+      let selectedText = window.getSelection().toString();
+      selectedText = selectedText.replace(/2caa7fa4a66f2f8d150f1da93d306261/g, "HIDDEN");
+      e.clipboardData.setData("text/plain", selectedText);
+      if (Date.now() < blockUntil) return;
+      blockUntil = Date.now() + 3600000;
+      showSpeechBubbleInChunks("1시간동안 차단됩니다.");
+    });
+
+    async function sendChat() {
+      const inputEl = document.getElementById("chat-input");
+      const input = inputEl.value.trim();
+      
+      if (!input) return;
+
+      let response = "";
+      const lowerInput = input.toLowerCase();
+
+      if (lowerInput.startsWith("지역 ")) {
+        const newCity = lowerInput.replace("지역", "").trim();
+        if(newCity) {
+          if (newCity === "서울") {
+            currentCity = newCity;
+            response = `지역이 ${newCity}(으)로 변경되었습니다.`;
+          } else {
+            response = "지원하지 않는 지역입니다.";
+          }
+        } else {
+          response = "변경할 지역을 입력해주세요.";
+        }
+      } else {
+        response = "저는 그 질문을 이해하지 못했어요. 다시 한번 시도해 주세요!";
+      }
+
+      showSpeechBubbleInChunks(response);
+      inputEl.value = "";
+    }
+
+    function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
+      const bubble = document.getElementById("speech-bubble");
+      const chunks = [];
+      for (let i = 0; i < text.length; i += chunkSize) {
+        chunks.push(text.slice(i, i + chunkSize));
+      }
+      let index = 0;
+      function showNextChunk() {
+        if (index < chunks.length) {
+          bubble.textContent = chunks[index];
+          bubble.style.display = "block";
+          index++;
+          setTimeout(showNextChunk, delay);
+        } else {
+          setTimeout(() => { bubble.style.display = "none"; }, 3000);
+        }
+      }
+      showNextChunk();
+    }
+
+    function changeRegion(value) {
+      currentCity = value;
+      showSpeechBubbleInChunks(`지역이 ${value}(으)로 변경되었습니다.`);
+    }
+
+    window.addEventListener("load", function() {
+      showPricingPlans();
+    });
+  </script>
 </head>
 <body>
-  <header>
-    <h1>AI 3D 비서</h1>
-    <p>혁신적인 3D 인공지능 비서와 함께 미래를 경험하세요!</p>
-  </header>
+  <div id="right-hud">
+    <h3>채팅창</h3>
+    <select id="region-select" onchange="changeRegion(this.value)">
+      <option value="서울">서울</option>
+      <option value="인천">인천</option>
+      <option value="부산">부산</option>
+      <option value="대구">대구</option>
+      <!-- 추가적인 지역을 선택할 수 있음 -->
+    </select>
+    <div id="chat-log"></div>
+    <div id="chat-input-area">
+      <input type="text" id="chat-input" placeholder="채팅 입력..." />
+    </div>
+  </div>
   
-  <nav>
-    <ul>
-      <li><a href="#about">소개</a></li>
-      <li><a href="#features">기능</a></li>
-      <li><a href="#pricing">요금제</a></li>
-      <li><a href="#demo">데모</a></li>
-      <li><a href="#contact">문의</a></li>
-    </ul>
-  </nav>
-
-  <div class="container">
-    <!-- 소개 섹션 -->
-    <section id="about" class="section">
-      <h2>소개</h2>
-      <p>
-        AI 3D 비서는 자연어 처리, 음성 인식, 캘린더 관리, 날씨 정보, 알림 기능을 한데 모은 차세대 3D 인공지능 비서입니다.
-        몰입감 있는 3D 캐릭터와 실시간 애니메이션 효과로 사용자에게 새로운 인터랙티브 경험을 제공합니다.
-      </p>
-    </section>
-
-    <!-- 기능 섹션 -->
-    <section id="features" class="section">
-      <h2>주요 기능</h2>
-      <div class="features">
-        <div class="feature">
-          <h3>자연어 처리</h3>
-          <p>효율적이고 직관적인 언어 처리로 사용자의 의도를 정확하게 파악합니다.</p>
-        </div>
-        <div class="feature">
-          <h3>3D 애니메이션</h3>
-          <p>실시간 3D 캐릭터 애니메이션으로 몰입감 있는 인터페이스를 제공합니다.</p>
-        </div>
-        <div class="feature">
-          <h3>캘린더 & 알림</h3>
-          <p>스마트한 일정 관리와 중요한 알림 기능을 통해 당신의 일정을 챙깁니다.</p>
-        </div>
-        <div class="feature">
-          <h3>날씨 정보</h3>
-          <p>실시간 날씨 데이터를 제공하여 상황에 맞는 맞춤형 정보를 전달합니다.</p>
-        </div>
-        <div class="feature">
-          <h3>음성 인식</h3>
-          <p>편리한 음성 명령 입력 시스템으로 손쉬운 명령 실행이 가능합니다.</p>
-        </div>
-        <div class="feature">
-          <h3>결제 시스템 연동</h3>
-          <p>안전한 결제 시스템과 연동되어 상용화 준비가 완벽하게 완료되었습니다.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 요금제 섹션 -->
-    <section id="pricing" class="section">
-      <h2>요금제 안내</h2>
-      <div class="pricing-plans">
-        <div class="plan">
-          <h3>월 구독</h3>
-          <p><strong>23,000원</strong> / 월</p>
-        </div>
-        <div class="plan">
-          <h3>주간 구독</h3>
-          <p><strong>16,000원</strong> / 주</p>
-        </div>
-      </div>
-      <p>최신 업데이트와 다양한 기능들이 포함된 최상의 서비스를 경험해 보세요.</p>
-    </section>
-
-    <!-- 데모 섹션 -->
-    <section id="demo" class="section">
-      <h2>데모</h2>
-      <p>아래 3D 캔버스에서 AI 3D 비서의 인터랙티브한 모습을 확인해 보세요.</p>
-      <div id="three-canvas"></div>
-    </section>
-
-    <!-- 문의 섹션 -->
-    <section id="contact" class="section">
-      <h2>문의</h2>
-      <p>더 궁금한 사항이나 제휴 문의는 아래 양식을 통해 연락 주시기 바랍니다.</p>
-      <form id="contact-form">
-        <label for="name">이름:</label>
-        <input type="text" id="name" name="name" required>
-        
-        <label for="email">이메일:</label>
-        <input type="email" id="email" name="email" required>
-        
-        <label for="message">문의 내용:</label>
-        <textarea id="message" name="message" rows="5" required></textarea>
-        
-        <button type="submit">전송</button>
-      </form>
-    </section>
+  <div id="hud-3">
+    <h3>요금제 안내</h3>
+    <p><strong>월 구독:</strong> 23,000원</p>
+    <p><strong>주간 구독:</strong> 16,000원</p>
+    <button onclick="showPricingPlans()">요금제 보기</button>
   </div>
 
-  <footer>
-    <p>&copy; 2025 AI 3D 비서. All rights reserved.</p>
-  </footer>
+  <div id="left-hud">
+    <h3>캘린더</h3>
+    <div id="calendar-container">
+      <!-- 캘린더와 기타 일정 관리 기능 -->
+    </div>
+  </div>
+
+  <div id="speech-bubble"></div>
+  
+  <div id="version-select">
+    <select onchange="changeRegion(this.value)">
+      <option value="latest">최신 버전</option>
+      <option value="1.3">구버전 1.3</option>
+    </select>
+  </div>
 
   <script>
-    // Three.js를 이용한 3D 데모 초기화
-    let scene, camera, renderer, cube;
-
-    function init3D() {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, document.getElementById('three-canvas').clientWidth / document.getElementById('three-canvas').clientHeight, 0.1, 1000);
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(document.getElementById('three-canvas').clientWidth, document.getElementById('three-canvas').clientHeight);
-      
-      const canvasDiv = document.getElementById('three-canvas');
-      canvasDiv.appendChild(renderer.domElement);
-
-      // 3D 비서 자리 표시자로 단순 큐브 생성
-      const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
-
-      camera.position.z = 5;
-      animate();
-    }
-
-    function animate() {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-
-    // 창 크기 변경 시 캔버스 사이즈 업데이트
-    window.addEventListener('resize', () => {
-      const canvasDiv = document.getElementById('three-canvas');
-      camera.aspect = canvasDiv.clientWidth / canvasDiv.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(canvasDiv.clientWidth, canvasDiv.clientHeight);
-    });
-
-    init3D();
-
-    // 간단한 문의 폼 제출 처리 (데모용)
-    document.getElementById('contact-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      alert('문의가 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
-      this.reset();
-    });
+    // 여기서 추가적인 기능을 처리하는 로직을 작성할 수 있음
   </script>
 </body>
 </html>
