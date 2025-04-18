@@ -152,7 +152,7 @@ function animate() {
 
 document.addEventListener("DOMContentLoaded", function() {
   const regionSelect = document.getElementById("region-select") || document.createElement("select");
-  regionSelect.id = interd-select";
+  regionSelect.id = "region-select"; // 오타 수정
   regionList.forEach(region => {
     const option = document.createElement("option");
     option.value = region;
@@ -161,14 +161,13 @@ document.addEventListener("DOMContentLoaded", function() {
     regionSelect.appendChild(option);
   });
 
-  // 문의 폼 제출
   const contactForm = document.getElementById("contact-form");
   if (contactForm) {
     contactForm.addEventListener("submit", async function(e) {
       e.preventDefault();
       const formData = new FormData(this);
       try {
-        const response = await fetch("/send-email", {
+        const response = await fetch("https://emotionail-backend.onrender.com/send-email", {
           method: "POST",
           body: formData
         });
