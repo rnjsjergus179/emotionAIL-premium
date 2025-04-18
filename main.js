@@ -84,10 +84,12 @@ function sendHud2Chat() {
   logEl.appendChild(userMsg);
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  const cleanedMsg = msg.replace(/,/g, '');
+  const cleanedMsg = msg.replace(/,/g, '').replace(/\s/g, ''); // 쉼표와 공백 제거
 
   if (/환불/.test(msg)) {
-    resp.innerHTML = "AI: 환불 요청을 위해 QR 코드를 이메일로 보내주세요.";
+    resp.innerHTML = `AI: 환불 요청을 위해 아래 정보를 작성해 주세요.<br>
+      환불은 결제 후 7일 이내 미사용 시 가능하며, 처리에 3~5일이 소요될 수 있습니다.<br>
+      이메일로 QR 코드를 보내주시면 접수가 완료됩니다.`;
   } else if (msg.includes("결제 진행 절차") || msg.includes("결제 안내")) {
     resp.innerHTML = paymentGuideMessage;
   } else if (/^\d+$/.test(cleanedMsg)) {
@@ -95,7 +97,8 @@ function sendHud2Chat() {
     const qrCodeUrl = "https://raw.githubusercontent.com/mjsjergus179/emotionAI-premium/main/QR%20코드.jpg";
     if (amount === 23000 || amount === 16000) {
       resp.innerHTML = `AI: ${amount}원 결제를 위한 QR 코드입니다.<br>
-        <img src="${qrCodeUrl}" alt="QR Code for ${amount}원" style="width: 200px; margin-top: 10px; border-radius: 8px;">`;
+        <img src="${qrCodeUrl}" alt="QR Code for ${amount}원" style="width: 200px; margin-top: 10px; border-radius: 8px;" onerror="this.nextSibling.style.display='block'; this.style.display='none';">
+        <span style="display:none; color:red;">QR 코드 로드에 실패했습니다. 관리자에게 문의하세요.</span>`;
     } else {
       resp.textContent = "AI: 유효한 결제 금액(23000 또는 16000)을 입력해주세요.";
     }
@@ -127,7 +130,9 @@ function showRefundGuide() {
   const logEl = document.getElementById("hud-2-log");
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  resp.innerHTML = "AI: 환불 요청을 위해 QR 코드를 이메일로 보내주세요.";
+  resp.innerHTML = `AI: 환불 요청을 위해 아래 정보를 작성해 주세요.<br>
+    환불은 결제 후 7일 이내 미사용 시 가능하며, 처리에 3~5일이 소요될 수 있습니다.<br>
+    이메일로 QR 코드를 보내주시면 접수가 완료됩니다.`;
   logEl.appendChild(resp);
   logEl.scrollTop = logEl.scrollHeight;
 }
