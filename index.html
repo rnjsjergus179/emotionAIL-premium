@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -57,7 +58,9 @@
         <div id="right-hud">
           <h3>데모 채팅창</h3>
           <select id="region-select" onchange="changeRegion(this.value)">
-            <option value="" disabled>지역 선택</option>
+            <option value="" disabled selected>지역 선택</option>
+            <option value="Seoul">서울</option>
+            <option value="Busan">부산</option>
           </select>
           <div id="chat-log"></div>
           <div id="chat-input-area">
@@ -118,18 +121,8 @@
     </section>
     <section id="contact" class="section">
       <h2>문의</h2>
-      <p>더 궁금한 사항이나 제휴 문의는 아래 양식을 통해 연락 주시기 바랍니다.</p>
-      <form id="contact-form" enctype="multipart/form-data">
-        <label for="name">이름:</label>
-        <input type="text" id="name" name="name" required>
-        <label for="email">이메일:</label>
-        <input type="email" id="email" name="email" required>
-        <label for="message">문의 내용:</label>
-        <textarea id="message" name="message" rows="5" required></textarea>
-        <label for="file-upload">QR 코드 업로드 (선택 사항):</label>
-        <input type="file" id="file-upload" name="file-upload" accept="image/*">
-        <button type="submit">전송</button>
-      </form>
+      <p>더 궁금한 사항이나 제휴 문의는 아래 이메일로 연락 주시기 바랍니다.</p>
+      <a href="mailto:your-email@example.com?subject=AI 3D 비서 문의">your-email@example.com</a>
     </section>
   </div>
   <footer>
