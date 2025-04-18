@@ -1,3 +1,4 @@
+// 지역 관련 설정
 let currentCity = "서울";
 const regionMap = {
   "서울": "Seoul", "인천": "Incheon", "수원": "Suwon", "고양": "Goyang",
@@ -9,6 +10,7 @@ const regionMap = {
 };
 const regionList = Object.keys(regionMap);
 
+// 결제 안내 메시지
 const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
   월 구독은 23,000원, 주간 구독은 16,000원입니다.<br>
   결제할 금액을 입력하세요 (예: 23000 또는 16000).<br>
@@ -21,6 +23,7 @@ const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
     </ul>
   </div>`;
 
+// 말풍선 표시 함수
 function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
   const bubble = document.getElementById("speech-bubble") || document.createElement("div");
   bubble.id = "speech-bubble";
@@ -29,164 +32,4 @@ function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
   for (let i = 0; i < text.length; i += chunkSize) {
     chunks.push(text.slice(i, i + chunkSize));
   }
-  let index = 0;
-  function showNextChunk() {
-    if (index < chunks.length) {
-      bubble.textContent = chunks[index];
-      bubble.style.display = "block";
-      index++;
-      setTimeout(showNextChunk, delay);
-    } else {
-      setTimeout(() => { bubble.style.display = "none"; }, 3000);
-    }
-  }
-  showNextChunk();
-}
-
-function changeRegion(value) {
-  currentCity = value;
-  updateMap();
-  showSpeechBubbleInChunks(`지역이 ${value}(으)로 변경되었습니다.`);
-}
-
-function toggleHud2() {
-  const hud2 = document.getElementById("hud-2") || document.createElement("div");
-  hud2.id = "hud-2";
-  document.body.appendChild(hud2);
-  hud2.classList.toggle("show");
-}
-
-function sendHud2Chat() {
-  const inputEl = document.getElementById("hud-2-input");
-  const msg = inputEl ? inputEl.value.trim() : "";
-  if (!msg) return;
-  const logEl = document.getElementById("hud-2-log") || document.createElement("div");
-  logEl.id = "hud-2-log";
-  document.getElementById("hud-2").appendChild(logEl);
-  const userMsg = document.createElement("p");
-  userMsg.style.color = "#333";
-  userMsg.textContent = "사용자: " + msg;
-  logEl.appendChild(userMsg);
-  const resp = document.createElement("p");
-  resp.style.color = "#2575fc";
-  const cleanedMsg = msg.replace(/,/g, '');
-
-  if (/환불/.test(msg)) {
-    resp.innerHTML = "AI: 환불 요청을 위해 QR 코드를 이메일로 보내주세요.";
-  } else if (msg.includes("결제 진행 절차") || msg.includes("결제 안내")) {
-    resp.innerHTML = paymentGuideMessage;
-  } else if (/^\d+$/.test(cleanedMsg)) {
-    const amount = parseInt(cleanedMsg);
-    if (amount === 23000) {
-      resp.innerHTML = `AI: 23,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
-    } else if (amount === 16000) {
-      resp.innerHTML = `AI: 16,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
-    } else {
-      resp.textContent = "AI: 잘못된 결제 금액입니다. 23000 또는 16000을 입력하세요.";
-    }
-  } else if (msg.startsWith("정보:")) {
-    const userInfo = msg.slice(3).trim();
-    if (userInfo) {
-      resp.textContent = `AI: 결제 완료가 확인되었습니다. 입력하신 정보: ${userInfo} (감사합니다.)`;
-    } else {
-      resp.textContent = "AI: '정보:' 뒤에 이메일 또는 닉네임을 입력해 주세요.";
-    }
-  } else {
-    resp.textContent = "AI: 이해하지 못했습니다. 다시 시도해 주세요.";
-  }
-  logEl.appendChild(resp);
-  logEl.scrollTop = logEl.scrollHeight;
-  inputEl.value = "";
-}
-
-function updateMap() {
-  const englishCity = regionMap[currentCity] || "Seoul";
-  const iframe = document.getElementById("map-iframe");
-  if (iframe) {
-    iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(englishCity)}&output=embed`;
-  }
-}
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas") || document.createElement("canvas"), alpha: true });
-renderer.domElement.id = "canvas";
-
-function onWindowResize() {
-  const canvasBox = document.getElementById("three-canvas") || document.createElement("div");
-  canvasBox.id = "three-canvas";
-  document.body.appendChild(canvasBox);
-  const width = canvasBox.clientWidth;
-  const height = canvasBox.clientHeight;
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(width, height);
-}
-window.addEventListener("resize", onWindowResize);
-
-function setupScene() {
-  const canvasBox = document.getElementById("three-canvas") || document.createElement("div");
-  canvasBox.id = "three-canvas";
-  document.body.appendChild(canvasBox);
-  renderer.setSize(canvasBox.clientWidth, canvasBox.clientHeight);
-  camera.position.set(5, 5, 10);
-  camera.lookAt(0, 0, 0);
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-  directionalLight.position.set(5, 10, 7).normalize();
-  scene.add(directionalLight);
-  scene.add(new THREE.AmbientLight(0x333333));
-}
-
-function mainInit() {
-  setupScene();
-  onWindowResize();
-  animate();
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-  const regionSelect = document.getElementById("region-select") || document.createElement("select");
-  regionSelect.id = "region-select"; // 오타 수정
-  regionList.forEach(region => {
-    const option = document.createElement("option");
-    option.value = region;
-    option.textContent = `${region} (${regionMap[region]})`;
-    if (region === currentCity) option.selected = true;
-    regionSelect.appendChild(option);
-  });
-
-  const contactForm = document.getElementById("contact-form");
-  if (contactForm) {
-    contactForm.addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      try {
-        const response = await fetch("https://emotionail-backend.onrender.com/send-email", {
-          method: "POST",
-          body: formData
-        });
-        if (response.ok) {
-          alert("문의가 성공적으로 전송되었습니다.");
-          this.reset();
-        } else {
-          alert("문의 전송에 실패했습니다. 다시 시도해 주세요.");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("문의 전송 중 오류가 발생했습니다.");
-      }
-    });
-  }
-});
-
-window.addEventListener("load", async () => {
-  mainInit();
-  updateMap();
-  onWindowResize();
-});
+  let index = 0
