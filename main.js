@@ -195,8 +195,7 @@ function updateLightning() {
   }
 }
 
-// 이후 THREE.js 관련 코드 및 나머지 함수들은 변경 없이 유지됩니다.
-// (setupScene, animate, mainInit, initCalendar 등은 그대로 사용)
+// THREE.js 관련 코드
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas"), alpha: true });
