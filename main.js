@@ -2,7 +2,6 @@ let blockUntil = 0;
 let danceInterval;
 let currentCity = "서울";
 let currentWeather = "";
-const weatherKey = "2caa7fa4a66f2f8d150f1da93d306261";
 const regionMap = {
   "서울": "Seoul", "인천": "Incheon", "수원": "Suwon", "고양": "Goyang",
   "성남": "Seongnam", "용인": "Yongin", "부천": "Bucheon", "안양": "Anyang",
@@ -146,12 +145,13 @@ function showRefundGuide() {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
+// 백엔드 API를 통해 날씨 데이터를 가져오는 함수로 변경
 async function getWeather() {
   try {
     const englishCity = regionMap[currentCity] || "Seoul";
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(englishCity)}&appid=${weatherKey}&units=metric&lang=kr`;
+    const url = `/api/weather?city=${encodeURIComponent(englishCity)}`;
     const res = await fetch(url);
-    if (!res.ok) throw new Error("날씨 API 호출 실패");
+    if (!res.ok) throw new Error("날씨 데이터를 가져오지 못했습니다.");
     const data = await res.json();
     const description = data.weather[0].description;
     const temp = data.main.temp;
@@ -205,6 +205,8 @@ function updateLightning() {
   }
 }
 
+// 이후 THREE.js 관련 코드 및 나머지 함수들은 변경 없이 유지됩니다.
+// (setupScene, animate, mainInit, initCalendar 등은 그대로 사용)
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas"), alpha: true });
