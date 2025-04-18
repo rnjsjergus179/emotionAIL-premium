@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function() {
     e.preventDefault();
     const formData = new FormData(this);
     try {
-      const response = await fetch("https://your-backend-api.com/send-email", {
+      const response = await fetch("https://emotionail-server.onrender.com/send-email", {
         method: "POST",
         body: formData
       });
