@@ -658,6 +658,29 @@ document.addEventListener("DOMContentLoaded", function() {
     regionSelect.appendChild(option);
   });
   document.getElementById("hud-2-toggle").addEventListener("click", toggleHud2);
+
+  // 문의 폼 제출 이벤트 리스너 추가
+  document.getElementById('contact-form').addEventListener('submit', async function (event) {
+    event.preventDefault(); // 기본 폼 제출 방지
+
+    const form = document.getElementById('contact-form');
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch('/send-inquiry', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error('서버 응답 오류');
+      const result = await response.text();
+      alert(result);
+      form.reset(); // 성공 시 폼 초기화
+    } catch (error) {
+      console.error('제출 오류:', error);
+      alert('문의 제출에 실패했습니다.');
+    }
+  });
 });
 
 window.addEventListener("load", async () => {
