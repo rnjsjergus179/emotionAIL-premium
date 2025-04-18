@@ -22,7 +22,9 @@ const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
   </div>`;
 
 function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
-  const bubble = document.getElementById("speech-bubble");
+  const bubble = document.getElementById("speech-bubble") || document.createElement("div");
+  bubble.id = "speech-bubble";
+  document.body.appendChild(bubble);
   const chunks = [];
   for (let i = 0; i < text.length; i += chunkSize) {
     chunks.push(text.slice(i, i + chunkSize));
@@ -48,15 +50,19 @@ function changeRegion(value) {
 }
 
 function toggleHud2() {
-  const hud2 = document.getElementById("hud-2");
+  const hud2 = document.getElementById("hud-2") || document.createElement("div");
+  hud2.id = "hud-2";
+  document.body.appendChild(hud2);
   hud2.classList.toggle("show");
 }
 
 function sendHud2Chat() {
   const inputEl = document.getElementById("hud-2-input");
-  const msg = inputEl.value.trim();
+  const msg = inputEl ? inputEl.value.trim() : "";
   if (!msg) return;
-  const logEl = document.getElementById("hud-2-log");
+  const logEl = document.getElementById("hud-2-log") || document.createElement("div");
+  logEl.id = "hud-2-log";
+  document.getElementById("hud-2").appendChild(logEl);
   const userMsg = document.createElement("p");
   userMsg.style.color = "#333";
   userMsg.textContent = "사용자: " + msg;
@@ -73,10 +79,10 @@ function sendHud2Chat() {
     const amount = parseInt(cleanedMsg);
     if (amount === 23000) {
       resp.innerHTML = `AI: 23,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="./QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+        <img src="QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
     } else if (amount === 16000) {
       resp.innerHTML = `AI: 16,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="./QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+        <img src="QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
     } else {
       resp.textContent = "AI: 잘못된 결제 금액입니다. 23000 또는 16000을 입력하세요.";
     }
@@ -95,36 +101,23 @@ function sendHud2Chat() {
   inputEl.value = "";
 }
 
-function showPaymentGuide() {
-  const logEl = document.getElementById("hud-2-log");
-  const resp = document.createElement("p");
-  resp.style.color = "#2575fc";
-  resp.innerHTML = paymentGuideMessage;
-  logEl.appendChild(resp);
-  logEl.scrollTop = logEl.scrollHeight;
-}
-
-function showRefundGuide() {
-  const logEl = document.getElementById("hud-2-log");
-  const resp = document.createElement("p");
-  resp.style.color = "#2575fc";
-  resp.innerHTML = "AI: 환불 요청을 위해 QR 코드를 이메일로 보내주세요.";
-  logEl.appendChild(resp);
-  logEl.scrollTop = logEl.scrollHeight;
-}
-
 function updateMap() {
   const englishCity = regionMap[currentCity] || "Seoul";
-  document.getElementById("map-iframe").src =
-    `https://www.google.com/maps?q=${encodeURIComponent(englishCity)}&output=embed`;
+  const iframe = document.getElementById("map-iframe");
+  if (iframe) {
+    iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(englishCity)}&output=embed`;
+  }
 }
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas"), alpha: true });
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas") || document.createElement("canvas"), alpha: true });
+renderer.domElement.id = "canvas";
 
 function onWindowResize() {
-  const canvasBox = document.getElementById("three-canvas");
+  const canvasBox = document.getElementById("three-canvas") || document.createElement("div");
+  canvasBox.id = "three-canvas";
+  document.body.appendChild(canvasBox);
   const width = canvasBox.clientWidth;
   const height = canvasBox.clientHeight;
   camera.aspect = width / height;
@@ -134,7 +127,9 @@ function onWindowResize() {
 window.addEventListener("resize", onWindowResize);
 
 function setupScene() {
-  const canvasBox = document.getElementById("three-canvas");
+  const canvasBox = document.getElementById("three-canvas") || document.createElement("div");
+  canvasBox.id = "three-canvas";
+  document.body.appendChild(canvasBox);
   renderer.setSize(canvasBox.clientWidth, canvasBox.clientHeight);
   camera.position.set(5, 5, 10);
   camera.lookAt(0, 0, 0);
@@ -156,7 +151,8 @@ function animate() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  const regionSelect = document.getElementById("region-select");
+  const regionSelect = document.getElementById("region-select") || document.createElement("select");
+  regionSelect.id = interd-select";
   regionList.forEach(region => {
     const option = document.createElement("option");
     option.value = region;
@@ -164,28 +160,30 @@ document.addEventListener("DOMContentLoaded", function() {
     if (region === currentCity) option.selected = true;
     regionSelect.appendChild(option);
   });
-  document.getElementById("hud-2-toggle").addEventListener("click", toggleHud2);
 
-  // Form submission
-  document.getElementById("contact-form").addEventListener("submit", async function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    try {
-      const response = await fetch("https://emotionail-server.onrender.com/send-email", {
-        method: "POST",
-        body: formData
-      });
-      if (response.ok) {
-        alert("문의가 성공적으로 전송되었습니다.");
-        this.reset();
-      } else {
-        alert("문의 전송에 실패했습니다. 다시 시도해 주세요.");
+  // 문의 폼 제출
+  const contactForm = document.getElementById("contact-form");
+  if (contactForm) {
+    contactForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      try {
+        const response = await fetch("/send-email", {
+          method: "POST",
+          body: formData
+        });
+        if (response.ok) {
+          alert("문의가 성공적으로 전송되었습니다.");
+          this.reset();
+        } else {
+          alert("문의 전송에 실패했습니다. 다시 시도해 주세요.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("문의 전송 중 오류가 발생했습니다.");
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("문의 전송 중 오류가 발생했습니다.");
-    }
-  });
+    });
+  }
 });
 
 window.addEventListener("load", async () => {
