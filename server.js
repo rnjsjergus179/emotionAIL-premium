@@ -4,7 +4,7 @@ const multer = require('multer');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// 환경 변수 로드 (Render 대시보드에서 설정된 값 사용)
+// 환경 변수 로드
 dotenv.config();
 
 const app = express();
@@ -15,8 +15,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // 미들웨어 설정
-app.use(cors());           // CORS 허용
-app.use(express.json());   // JSON 요청 파싱
+app.use(cors());
+app.use(express.json());
 
 // POST /send-email 엔드포인트
 app.post('/send-email', upload.single('file-upload'), async (req, res) => {
@@ -27,21 +27,18 @@ app.post('/send-email', upload.single('file-upload'), async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.OWNER_EMAIL,       // Gmail 주소
-      pass: process.env.GOOGLE_APP_PASSWORD // Gmail 앱 비밀번호
+      user: process.env.OWNER_EMAIL,       // rnjsjergus179@gmail.com
+      pass: process.env.GOOGLE_APP_PASSWORD // Render에서 설정된 앱 비밀번호
     }
   });
 
   // 이메일 옵션
   const mailOptions = {
     from: email,
-    to: process.env.OWNER_EMAIL,
+    to: process.env.OWNER_EMAIL || 'rnjsjergus179@gmail.com', // 기본값으로 보장
     subject: `새로운 문의: ${name}`,
     text: `이름: ${name}\n이메일: ${email}\n문의 내용: ${message}`,
-    attachments: file ? [{
-      filename: file.originalname,
-      content: file.buffer
-    }] : []
+    attachments: file ? [{ filename: file.originalname, content: file.buffer }] : []
   };
 
   // 이메일 전송
@@ -50,7 +47,7 @@ app.post('/send-email', upload.single('file-upload'), async (req, res) => {
     res.status(200).send('이메일이 성공적으로 전송되었습니다.');
   } catch (error) {
     console.error('이메일 전송 오류:', error);
-    res.status(500).send('이메일 전송에 실패했습니다.');
+    res.status(500).send('이메일 전송에 실패했습니다: ' + error.message);
   }
 });
 
