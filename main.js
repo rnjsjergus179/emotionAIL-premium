@@ -92,14 +92,12 @@ function sendHud2Chat() {
     resp.innerHTML = paymentGuideMessage;
   } else if (/^\d+$/.test(cleanedMsg)) {
     const amount = parseInt(cleanedMsg);
-    if (amount === 23000) {
-      resp.innerHTML = `AI: 23,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="QR코드/QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
-    } else if (amount === 16000) {
-      resp.innerHTML = `AI: 16,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="QR코드/QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+    const qrCodeUrl = "https://raw.githubusercontent.com/mjsjergus179/emotionAI-premium/main/QR%20코드.jpg";
+    if (amount === 23000 || amount === 16000) {
+      resp.innerHTML = `AI: ${amount}원 결제를 위한 QR 코드입니다.<br>
+        <img src="${qrCodeUrl}" alt="QR Code for ${amount}원" style="width: 200px; margin-top: 10px; border-radius: 8px;">`;
     } else {
-      resp.textContent = "AI: 잘못된 결제 금액입니다. 23000 또는 16000을 입력하세요.";
+      resp.textContent = "AI: 유효한 결제 금액(23000 또는 16000)을 입력해주세요.";
     }
   } else if (msg.startsWith("정보:")) {
     const userInfo = msg.slice(3).trim();
