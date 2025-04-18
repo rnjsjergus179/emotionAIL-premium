@@ -48,16 +48,6 @@ function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
   showNextChunk();
 }
 
-document.addEventListener("copy", function(e) {
-  e.preventDefault();
-  let selectedText = window.getSelection().toString();
-  selectedText = selectedText.replace(/2caa7fa4a66f2f8d150f1da93d306261/g, "HIDDEN");
-  e.clipboardData.setData("text/plain", selectedText);
-  if (Date.now() < blockUntil) return;
-  blockUntil = Date.now() + 3600000;
-  showSpeechBubbleInChunks("1시간 동안 차단됩니다.");
-});
-
 function changeRegion(value) {
   currentCity = value;
   updateMap();
@@ -145,7 +135,7 @@ function showRefundGuide() {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
-// 백엔드 API를 통해 날씨 데이터를 가져오는 함수로 변경
+// 백엔드 API를 통해 날씨 데이터를 가져오는 함수
 async function getWeather() {
   try {
     const englishCity = regionMap[currentCity] || "Seoul";
