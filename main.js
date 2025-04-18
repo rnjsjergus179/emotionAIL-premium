@@ -13,6 +13,10 @@ const regionMap = {
 };
 const regionList = Object.keys(regionMap);
 
+// QR 코드 이미지 경로 설정 (GitHub Pages 루트 디렉토리)
+const qrCode23000 = "QR코드.jpg";      // 23000원 결제용 QR 코드 (공백 없음)
+const qrCode16000 = "QR%20코드.jpg";   // 16000원 결제용 QR 코드 (공백 포함, %20으로 인코딩)
+
 const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
   월 구독은 23,000원, 주간 구독은 16,000원입니다.<br>
   결제할 금액을 입력하세요 (예: 23000 또는 16000).<br>
@@ -94,8 +98,13 @@ function sendHud2Chat() {
     resp.innerHTML = paymentGuideMessage;
   } else if (/^\d+$/.test(cleanedMsg)) {
     const amount = parseInt(cleanedMsg);
-    const qrCodeUrl = "https://raw.githubusercontent.com/mjsjergus179/emotionAI-premium/main/QR%20코드.jpg";
-    if (amount === 23000 || amount === 16000) {
+    let qrCodeUrl;
+    if (amount === 23000) {
+      qrCodeUrl = qrCode23000;
+    } else if (amount === 16000) {
+      qrCodeUrl = qrCode16000;
+    }
+    if (qrCodeUrl) {
       resp.innerHTML = `AI: ${amount}원 결제를 위한 QR 코드입니다.<br>
         <img src="${qrCodeUrl}" alt="QR Code for ${amount}원" style="width: 200px; margin-top: 10px; border-radius: 8px;" onerror="this.nextSibling.style.display='block'; this.style.display='none';">
         <span style="display:none; color:red;">QR 코드 로드에 실패했습니다. 관리자에게 문의하세요.</span>`;
