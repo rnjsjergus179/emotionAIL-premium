@@ -1,8 +1,9 @@
-let blockUntil = 0;
-let danceInterval;
-let currentCity = "서울";
-let currentWeather = "";
-const weatherKey = "YOUR_API_KEY_HERE"; // OpenWeatherMap API 키로 교체하세요
+// 전역 변수 및 상수 정의
+let blockUntil = 0; // 복사 차단 시간
+let danceInterval; // 춤 애니메이션 인터벌 (현재 사용되지 않음)
+let currentCity = "서울"; // 현재 선택된 도시
+let currentWeather = ""; // 현재 날씨 상태
+const weatherKey = "2caa7fa4a66f2f8d150f1da93d306261"; // OpenWeatherMap API 키 (주의: 노출 위험)
 const regionMap = {
   "서울": "Seoul", "인천": "Incheon", "수원": "Suwon", "고양": "Goyang",
   "성남": "Seongnam", "용인": "Yongin", "부천": "Bucheon", "안양": "Anyang",
@@ -10,13 +11,10 @@ const regionMap = {
   "부산": "Busan", "대구": "Daegu", "광주": "Gwangju", "대전": "Daejeon",
   "울산": "Ulsan", "제주": "Jeju", "전주": "Jeonju", "청주": "Cheongju",
   "포항": "Pohang", "여수": "Yeosu", "김해": "Gimhae"
-};
-const regionList = Object.keys(regionMap);
+}; // 지역 매핑 객체
+const regionList = Object.keys(regionMap); // 지역 리스트
 
-// GitHub Pages 경로 설정 (your-repo를 실제 저장소 이름으로 교체)
-const repoPath = "/your-repo"; // 예: "/ai-3d-assistant"
-
-// 결제 안내 메시지
+// 결제 안내 메시지 (HTML 형식)
 const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
   월 구독은 23,000원, 주간 구독은 16,000원입니다.<br>
   결제할 금액을 입력하세요 (예: 23000 또는 16000).<br>
@@ -29,9 +27,10 @@ const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
     </ul>
   </div>`;
 
+// 텍스트를 청크 단위로 말풍선에 표시하는 함수
 function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
   const bubble = document.getElementById("speech-bubble");
-  if (!bubble) return;
+  if (!bubble) return; // 말풍선 요소가 없으면 종료
   const chunks = [];
   for (let i = 0; i < text.length; i += chunkSize) {
     chunks.push(text.slice(i, i + chunkSize));
@@ -50,16 +49,18 @@ function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
   showNextChunk();
 }
 
+// 복사 방지 및 API 키 숨김 기능
 document.addEventListener("copy", function(e) {
   e.preventDefault();
   let selectedText = window.getSelection().toString();
-  selectedText = selectedText.replace(/YOUR_API_KEY_HERE/g, "HIDDEN");
+  selectedText = selectedText.replace(/2caa7fa4a66f2f8d150f1da93d306261/g, "HIDDEN"); // API 키 숨김
   e.clipboardData.setData("text/plain", selectedText);
   if (Date.now() < blockUntil) return;
-  blockUntil = Date.now() + 3600000;
+  blockUntil = Date.now() + 3600000; // 1시간 차단
   showSpeechBubbleInChunks("1시간 동안 차단됩니다.");
 });
 
+// 지역 변경 함수
 function changeRegion(value) {
   currentCity = value;
   updateMap();
@@ -67,44 +68,12 @@ function changeRegion(value) {
   showSpeechBubbleInChunks(`지역이 ${value}(으)로 변경되었습니다.`);
 }
 
+// 채팅 전송 함수 (미구현 상태, 필요 시 추가 가능)
 async function sendChat() {
-  const inputEl = document.getElementById("chat-input");
-  const chatLog = document.getElementById("chat-log");
-  if (!inputEl || !chatLog) return;
-
-  const message = inputEl.value.trim();
-  if (!message) return;
-
-  const userMessage = document.createElement("div");
-  userMessage.textContent = `사용자: ${message}`;
-  chatLog.appendChild(userMessage);
-
-  if (message.includes('QR 코드')) {
-    appendBotMessage(`${repoPath}/QR코드/QR20%코드.jpg`, true);
-  } else if (message.includes('QR코드')) {
-    appendBotMessage(`${repoPath}/QR코드/QR20%코드.jpg`, true);
-  } else {
-    appendBotMessage("AI: 이해하지 못했습니다. 다시 시도해 주세요.");
-  }
-
-  inputEl.value = "";
-  chatLog.scrollTop = chatLog.scrollHeight;
+  // 채팅 기능 구현 (필요 시 추가)
 }
 
-function appendBotMessage(message, isImage = false) {
-  const chatLog = document.getElementById("chat-log");
-  if (!chatLog) return;
-
-  const messageElement = document.createElement("div");
-  if (isImage) {
-    messageElement.innerHTML = `<img src="${message}" alt="QR Code" style="max-width: 100%; border-radius: 8px;">`;
-  } else {
-    messageElement.textContent = message;
-  }
-  chatLog.appendChild(messageElement);
-  chatLog.scrollTop = chatLog.scrollHeight;
-}
-
+// HUD2 토글 함수
 function toggleHud2() {
   const hud2 = document.getElementById("hud-2");
   if (!hud2) return;
@@ -115,6 +84,7 @@ function toggleHud2() {
   }
 }
 
+// HUD2 채팅 전송 함수 (QR 코드 표시 포함)
 function sendHud2Chat() {
   const inputEl = document.getElementById("hud-2-input");
   const logEl = document.getElementById("hud-2-log");
@@ -140,10 +110,10 @@ function sendHud2Chat() {
     const amount = parseInt(cleanedMsg);
     if (amount === 23000) {
       resp.innerHTML = `AI: 23,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="${repoPath}/QR코드/QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+        <img src="QR코드/QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
     } else if (amount === 16000) {
       resp.innerHTML = `AI: 16,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="${repoPath}/QR코드/QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+        <img src="QR코드/QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
     } else {
       resp.textContent = "AI: 잘못된 결제 금액입니다. 23000 또는 16000을 입력하세요.";
     }
@@ -162,20 +132,18 @@ function sendHud2Chat() {
   inputEl.value = "";
 }
 
+// 결제 안내 표시 함수
 function showPaymentGuide() {
   const logEl = document.getElementById("hud-2-log");
   if (!logEl) return;
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  resp.innerHTML = paymentGuideMessage + `<br>
-    <p>월 구독 23,000원 QR 코드:</p>
-    <img src="${repoPath}/QR코드/QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;"><br>
-    <p>주간 구독 16,000원 QR 코드:</p>
-    <img src="${repoPath}/QR코드/QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+  resp.innerHTML = paymentGuideMessage;
   logEl.appendChild(resp);
   logEl.scrollTop = logEl.scrollHeight;
 }
 
+// 환불 안내 표시 함수
 function showRefundGuide() {
   const logEl = document.getElementById("hud-2-log");
   if (!logEl) return;
@@ -186,6 +154,7 @@ function showRefundGuide() {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
+// 날씨 정보 가져오기 함수
 async function getWeather() {
   try {
     const englishCity = regionMap[currentCity] || "Seoul";
@@ -209,6 +178,7 @@ async function getWeather() {
   }
 }
 
+// 지도 업데이트 함수
 function updateMap() {
   const mapIframe = document.getElementById("map-iframe");
   if (!mapIframe) return;
@@ -216,6 +186,7 @@ function updateMap() {
   mapIframe.src = `https://www.google.com/maps?q=${encodeURIComponent(englishCity)}&output=embed`;
 }
 
+// 날씨 및 효과 업데이트 함수
 function updateWeatherAndEffects() {
   return getWeather().then(weatherData => {
     showSpeechBubbleInChunks(weatherData.message);
@@ -223,6 +194,7 @@ function updateWeatherAndEffects() {
   });
 }
 
+// 날씨 효과 업데이트 함수
 function updateWeatherEffects() {
   if (!currentWeather) return;
   if (currentWeather.indexOf("비") !== -1 || currentWeather.indexOf("소나기") !== -1) {
@@ -237,6 +209,7 @@ function updateWeatherEffects() {
   }
 }
 
+// 번개 효과 업데이트 함수
 function updateLightning() {
   if (currentWeather.indexOf("번개") !== -1 || currentWeather.indexOf("뇌우") !== -1) {
     if (Math.random() < 0.001) {
@@ -246,11 +219,12 @@ function updateLightning() {
   }
 }
 
-// Three.js 관련 설정
+// Three.js 기본 설정
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas"), alpha: true });
 
+// 창 크기 조정 시 호출되는 함수
 function onWindowResize() {
   const canvasBox = document.getElementById("three-canvas");
   if (!canvasBox) return;
@@ -262,6 +236,7 @@ function onWindowResize() {
 }
 window.addEventListener("resize", onWindowResize);
 
+// 3D 씬 설정 함수
 function setupScene() {
   const canvasBox = document.getElementById("three-canvas");
   if (!canvasBox) return;
@@ -274,6 +249,7 @@ function setupScene() {
   scene.add(new THREE.AmbientLight(0x333333));
 }
 
+// 태양 및 달 설정
 const sunMaterial = new THREE.MeshStandardMaterial({ color: 0xffcc00, emissive: 0xff9900, transparent: true, opacity: 0 });
 const sun = new THREE.Mesh(new THREE.SphereGeometry(1.5, 64, 64), sunMaterial);
 scene.add(sun);
@@ -282,6 +258,7 @@ const moonMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc, emissive:
 const moon = new THREE.Mesh(new THREE.SphereGeometry(1.2, 64, 64), moonMaterial);
 scene.add(moon);
 
+// 별 및 반딧불이 설정
 const stars = [];
 for (let i = 0; i < 200; i++) {
   const star = new THREE.Mesh(
@@ -304,6 +281,7 @@ for (let i = 0; i < 60; i++) {
   fireflies.push(firefly);
 }
 
+// 바닥 설정
 const floorGeometry = new THREE.PlaneGeometry(400, 400, 128, 128);
 const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 1, metalness: 0 });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -311,9 +289,11 @@ floor.rotation.x = -Math.PI/2;
 floor.position.y = -2;
 scene.add(floor);
 
+// 배경 그룹 설정
 const backgroundGroup = new THREE.Group();
 scene.add(backgroundGroup);
 
+// 건물 생성 함수
 function createBuilding(width, height, depth, color) {
   const group = new THREE.Group();
   const geometry = new THREE.BoxGeometry(width, height, depth);
@@ -335,6 +315,7 @@ function createBuilding(width, height, depth, color) {
   return group;
 }
 
+// 건물 배치
 for (let i = 0; i < 20; i++) {
   const w = Math.random() * 4 + 4;
   const h = Math.random() * 20 + 20;
@@ -348,6 +329,7 @@ for (let i = 0; i < 20; i++) {
   backgroundGroup.add(building);
 }
 
+// 집 생성 함수
 function createHouse(width, height, depth, baseColor, roofColor) {
   const group = new THREE.Group();
   const base = new THREE.Mesh(
@@ -376,6 +358,7 @@ function createHouse(width, height, depth, baseColor, roofColor) {
   return group;
 }
 
+// 집 배치
 for (let i = 0; i < 10; i++) {
   const w = Math.random() * 4 + 6;
   const h = Math.random() * 4 + 6;
@@ -387,6 +370,7 @@ for (let i = 0; i < 10; i++) {
   backgroundGroup.add(house);
 }
 
+// 가로등 생성 함수
 function createStreetlight() {
   const group = new THREE.Group();
   const pole = new THREE.Mesh(
@@ -407,13 +391,16 @@ function createStreetlight() {
   return group;
 }
 
+// 캐릭터 근처 가로등
 const characterStreetlight = createStreetlight();
 characterStreetlight.position.set(1, -2, 0);
 scene.add(characterStreetlight);
 
+// 비 그룹 설정
 let rainGroup = new THREE.Group();
 scene.add(rainGroup);
 
+// 비 초기화 함수
 function initRain() {
   const rainCount = 2000;
   const geometry = new THREE.BufferGeometry();
@@ -431,8 +418,10 @@ function initRain() {
 initRain();
 rainGroup.visible = false;
 
+// 구름 그룹 설정
 let houseCloudGroup = new THREE.Group();
 
+// 구름 생성 함수
 function createHouseCloud() {
   const cloud = new THREE.Group();
   const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 });
@@ -452,15 +441,18 @@ houseCloudGroup.add(singleCloud);
 houseCloudGroup.position.set(0, 10, -20);
 scene.add(houseCloudGroup);
 
+// 구름 업데이트 함수
 function updateHouseClouds() {
   singleCloud.position.x += 0.02;
   if (singleCloud.position.x > 10) singleCloud.position.x = -10;
 }
 
+// 번개 조명 설정
 let lightningLight = new THREE.PointLight(0xffffff, 0, 500);
 lightningLight.position.set(0, 50, 0);
 scene.add(lightningLight);
 
+// 캐릭터 그룹 설정
 let characterGroup = new THREE.Group();
 const charBody = new THREE.Mesh(
   new THREE.BoxGeometry(1, 1.5, 0.5),
@@ -500,9 +492,11 @@ characterGroup.add(
 characterGroup.position.y = -1;
 scene.add(characterGroup);
 
+// 캐릭터 조명 설정
 const characterLight = new THREE.PointLight(0xffee88, 1, 15);
 scene.add(characterLight);
 
+// 나무 생성 함수
 function createTree() {
   const group = new THREE.Group();
   const trunk = new THREE.Mesh(
@@ -519,12 +513,14 @@ function createTree() {
   return group;
 }
 
+// 나무 배치
 for (let i = 0; i < 10; i++) {
   const tree = createTree();
   tree.position.set(-50 + i * 10, -2, -15);
   scene.add(tree);
 }
 
+// 애니메이션 함수
 function animate() {
   requestAnimationFrame(animate);
   const now = new Date();
@@ -571,14 +567,17 @@ function animate() {
   renderer.render(scene, camera);
 }
 
+// 메인 초기화 함수
 function mainInit() {
   setupScene();
   onWindowResize();
   animate();
 }
 
+// 캘린더 관련 변수
 let currentYear, currentMonth;
 
+// 캘린더 초기화 함수
 function initCalendar() {
   const now = new Date();
   currentYear = now.getFullYear();
@@ -631,6 +630,7 @@ function initCalendar() {
   }
 }
 
+// 연도 선택 옵션 채우기 함수
 function populateYearSelect() {
   const yearSelect = document.getElementById("year-select");
   if (!yearSelect) return;
@@ -644,6 +644,7 @@ function populateYearSelect() {
   }
 }
 
+// 캘린더 렌더링 함수
 function renderCalendar(year, month) {
   const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
   const monthYearLabel = document.getElementById("month-year-label");
@@ -686,6 +687,7 @@ function renderCalendar(year, month) {
   }
 }
 
+// 캘린더 저장 함수
 function saveCalendar() {
   const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
   const calendarData = {};
@@ -705,6 +707,7 @@ function saveCalendar() {
   document.body.removeChild(dlAnchorElem);
 }
 
+// 튜토리얼 표시 함수
 function showTutorial() {
   const overlay = document.getElementById("tutorial-overlay");
   if (!overlay) return;
@@ -716,6 +719,7 @@ function showTutorial() {
   }, 4000);
 }
 
+// 버전 변경 함수
 function changeVersion(version) {
   if (version === "1.3") {
     window.location.href = window.location.href;
@@ -724,6 +728,7 @@ function changeVersion(version) {
   }
 }
 
+// DOM 로드 완료 시 실행
 document.addEventListener("DOMContentLoaded", function() {
   const regionSelect = document.getElementById("region-select");
   if (regionSelect) {
@@ -741,6 +746,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
+// 페이지 로드 완료 시 실행
 window.addEventListener("load", async () => {
   mainInit();
   initCalendar();
