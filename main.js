@@ -80,9 +80,9 @@ async function sendChat() {
   chatLog.appendChild(userMessage);
 
   if (message.includes('QR 코드')) {
-    appendBotMessage(`${repoPath}/QR코드/QR 코드.jpg`, true);
+    appendBotMessage(`${repoPath}/QR코드/QR20%코드.jpg`, true);
   } else if (message.includes('QR코드')) {
-    appendBotMessage(`${repoPath}/QR코드/QR코드.jpg`, true);
+    appendBotMessage(`${repoPath}/QR코드/QR20%코드.jpg`, true);
   } else {
     appendBotMessage("AI: 이해하지 못했습니다. 다시 시도해 주세요.");
   }
