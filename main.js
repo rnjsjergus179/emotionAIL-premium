@@ -27,7 +27,7 @@ const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
 
 function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
   const bubble = document.getElementById("speech-bubble");
-  if (!bubble) return; // 요소가 없으면 종료
+  if (!bubble) return;
   const chunks = [];
   for (let i = 0; i < text.length; i += chunkSize) {
     chunks.push(text.slice(i, i + chunkSize));
@@ -64,7 +64,41 @@ function changeRegion(value) {
 }
 
 async function sendChat() {
-  // 채팅 기능 구현 (필요 시 추가)
+  const inputEl = document.getElementById("chat-input");
+  const chatLog = document.getElementById("chat-log");
+  if (!inputEl || !chatLog) return;
+
+  const message = inputEl.value.trim();
+  if (!message) return;
+
+  const userMessage = document.createElement("div");
+  userMessage.textContent = `사용자: ${message}`;
+  chatLog.appendChild(userMessage);
+
+  if (message.includes('QR 코드')) {
+    appendBotMessage('/QR 코드.jpg', true);
+  } else if (message.includes('QR코드')) {
+    appendBotMessage('/QR코드.jpg', true);
+  } else {
+    appendBotMessage("AI: 이해하지 못했습니다. 다시 시도해 주세요.");
+  }
+
+  inputEl.value = "";
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function appendBotMessage(message, isImage = false) {
+  const chatLog = document.getElementById("chat-log");
+  if (!chatLog) return;
+
+  const messageElement = document.createElement("div");
+  if (isImage) {
+    messageElement.innerHTML = `<img src="${message}" alt="QR Code" style="max-width: 100%; border-radius: 8px;">`;
+  } else {
+    messageElement.textContent = message;
+  }
+  chatLog.appendChild(messageElement);
+  chatLog.scrollTop = chatLog.scrollHeight;
 }
 
 function toggleHud2() {
@@ -490,7 +524,8 @@ function animate() {
   const angle = (totalMin / 1440) * Math.PI * 2;
   const radius = 3;
   const headWorldPos = new THREE.Vector3();
-  head.getWorldPosition(headWorldPos);
+  head.getWorldPositi
+on(headWorldPos);
   sun.position.set(
     headWorldPos.x + Math.cos(angle) * radius,
     headWorldPos.y + Math.sin(angle) * radius,
