@@ -32,4 +32,32 @@ function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
   for (let i = 0; i < text.length; i += chunkSize) {
     chunks.push(text.slice(i, i + chunkSize));
   }
-  let index = 0
+  let index = 0;
+  const showNextChunk = () => {
+    if (index < chunks.length) {
+      bubble.innerHTML = chunks.slice(0, index + 1).join('');
+      index++;
+      setTimeout(showNextChunk, delay);
+    }
+  };
+  showNextChunk();
+}
+
+// AI 채팅창 토글 함수
+function toggleAIChat() {
+  const aiChat = document.getElementById("ai-chat");
+  if (aiChat.style.display === "none" || aiChat.style.display === "") {
+    aiChat.style.display = "block";
+  } else {
+    aiChat.style.display = "none";
+  }
+}
+
+// 페이지 로드 시 실행
+document.addEventListener('DOMContentLoaded', () => {
+  // AI 채팅창 버튼에 클릭 이벤트 추가
+  const aiChatButton = document.getElementById("ai-chat-button");
+  if (aiChatButton) {
+    aiChatButton.addEventListener('click', toggleAIChat);
+  }
+});
