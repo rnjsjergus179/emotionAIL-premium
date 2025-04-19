@@ -2,7 +2,7 @@ let blockUntil = 0;
 let danceInterval;
 let currentCity = "서울";
 let currentWeather = "";
-const weatherKey = "2caa7fa4a66f2f8d150f1da93d306261"; // 주의: API 키 노출 위험
+const weatherKey = "YOUR_API_KEY_HERE"; // OpenWeatherMap API 키로 교체하세요
 const regionMap = {
   "서울": "Seoul", "인천": "Incheon", "수원": "Suwon", "고양": "Goyang",
   "성남": "Seongnam", "용인": "Yongin", "부천": "Bucheon", "안양": "Anyang",
@@ -13,6 +13,10 @@ const regionMap = {
 };
 const regionList = Object.keys(regionMap);
 
+// GitHub Pages 경로 설정 (your-repo를 실제 저장소 이름으로 교체)
+const repoPath = "/your-repo"; // 예: "/ai-3d-assistant"
+
+// 결제 안내 메시지
 const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
   월 구독은 23,000원, 주간 구독은 16,000원입니다.<br>
   결제할 금액을 입력하세요 (예: 23000 또는 16000).<br>
@@ -49,7 +53,7 @@ function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
 document.addEventListener("copy", function(e) {
   e.preventDefault();
   let selectedText = window.getSelection().toString();
-  selectedText = selectedText.replace(/2caa7fa4a66f2f8d150f1da93d306261/g, "HIDDEN");
+  selectedText = selectedText.replace(/YOUR_API_KEY_HERE/g, "HIDDEN");
   e.clipboardData.setData("text/plain", selectedText);
   if (Date.now() < blockUntil) return;
   blockUntil = Date.now() + 3600000;
@@ -76,9 +80,9 @@ async function sendChat() {
   chatLog.appendChild(userMessage);
 
   if (message.includes('QR 코드')) {
-    appendBotMessage('/QR 코드.jpg', true);
+    appendBotMessage(`${repoPath}/QR코드/QR 코드.jpg`, true);
   } else if (message.includes('QR코드')) {
-    appendBotMessage('/QR코드.jpg', true);
+    appendBotMessage(`${repoPath}/QR코드/QR코드.jpg`, true);
   } else {
     appendBotMessage("AI: 이해하지 못했습니다. 다시 시도해 주세요.");
   }
@@ -136,10 +140,10 @@ function sendHud2Chat() {
     const amount = parseInt(cleanedMsg);
     if (amount === 23000) {
       resp.innerHTML = `AI: 23,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="QR코드/QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+        <img src="${repoPath}/QR코드/QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
     } else if (amount === 16000) {
       resp.innerHTML = `AI: 16,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="QR코드/QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+        <img src="${repoPath}/QR코드/QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
     } else {
       resp.textContent = "AI: 잘못된 결제 금액입니다. 23000 또는 16000을 입력하세요.";
     }
@@ -163,7 +167,11 @@ function showPaymentGuide() {
   if (!logEl) return;
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  resp.innerHTML = paymentGuideMessage;
+  resp.innerHTML = paymentGuideMessage + `<br>
+    <p>월 구독 23,000원 QR 코드:</p>
+    <img src="${repoPath}/QR코드/QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;"><br>
+    <p>주간 구독 16,000원 QR 코드:</p>
+    <img src="${repoPath}/QR코드/QR 코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
   logEl.appendChild(resp);
   logEl.scrollTop = logEl.scrollHeight;
 }
@@ -524,8 +532,7 @@ function animate() {
   const angle = (totalMin / 1440) * Math.PI * 2;
   const radius = 3;
   const headWorldPos = new THREE.Vector3();
-  head.getWorldPositi
-on(headWorldPos);
+  head.getWorldPosition(headWorldPos);
   sun.position.set(
     headWorldPos.x + Math.cos(angle) * radius,
     headWorldPos.y + Math.sin(angle) * radius,
