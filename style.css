@@ -280,7 +280,11 @@ footer { background: #333; color: #fff; text-align: center; padding: 20px; }
   text-align: center;
 }
 
-/* 토큰 입력창을 가운데 정렬하기 위한 스타일 추가 */
+/* 토큰 입력창 및 문구를 가운데 정렬하기 위한 스타일 */
+#token-section p {
+  text-align: center;
+}
+
 #token-input-area {
   display: flex;
   justify-content: center;
