@@ -48,7 +48,7 @@
       </div>
       <p>최신 업데이트와 다양한 기능이 포함된 최상의 서비스를 경험해 보세요.</p>
     </section>
-    <section id="demo" class="section" style="display: none;">
+    <section id="demo" class="section">
       <h2>데모</h2>
       <p>아래 박스에서 AI 3D 비서의 인터랙티브한 모습을 확인해 보세요.</p>
       <div id="three-canvas">
@@ -119,8 +119,8 @@
       <h2>문의</h2>
       <p>더 궁금한 사항이나 제휴 문의는 아래 이메일로 연락 주시기 바랍니다.</p>
     </section>
-    <!-- 토큰 입력창 추가 -->
-    <div id="token-input-container" style="display: none; text-align: center; margin: 20px;">
+    <!-- 토큰 입력창 추가 (문의 섹션 아래) -->
+    <div id="token-input-container" style="text-align: center; margin: 20px;">
       <input type="text" id="token-input" placeholder="토큰을 입력하세요" style="padding: 10px; width: 200px;" />
       <button onclick="submitToken()" style="padding: 10px 20px; margin-left: 10px;">제출</button>
       <p id="token-error" style="color: red; display: none; margin-top: 10px;">유효하지 않은 토큰입니다.</p>
@@ -136,26 +136,28 @@
 
     // 기능 활성화 함수
     function activateFeatures() {
-      document.getElementById("demo").style.display = "block";
-      // 추가적인 기능 활성화 로직이 필요하면 여기에 작성
+      document.querySelectorAll(".section").forEach(section => {
+        section.style.display = "block";
+      });
+      document.getElementById("token-input-container").style.display = "none";
     }
 
     // 기능 비활성화 함수
     function deactivateFeatures() {
-      document.getElementById("demo").style.display = "none";
-      // 추가적인 기능 비활성화 로직이 필요하면 여기에 작성
+      document.querySelectorAll(".section").forEach(section => {
+        section.style.display = "none";
+      });
+      document.getElementById("token-input-container").style.display = "block";
+      alert("결제가 필요합니다.");
     }
 
     // 토큰 확인 함수
     function checkToken() {
       const token = localStorage.getItem("token");
       if (token && validTokens.includes(token)) {
-        document.getElementById("token-input-container").style.display = "none";
         activateFeatures();
       } else {
-        document.getElementById("token-input-container").style.display = "block";
         deactivateFeatures();
-        alert("결제가 필요합니다.");
       }
     }
 
@@ -164,7 +166,6 @@
       const token = document.getElementById("token-input").value;
       if (validTokens.includes(token)) {
         localStorage.setItem("token", token);
-        document.getElementById("token-input-container").style.display = "none";
         document.getElementById("token-error").style.display = "none";
         activateFeatures();
       } else {
