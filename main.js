@@ -68,11 +68,6 @@ function changeRegion(value) {
   showSpeechBubbleInChunks(`지역이 ${value}(으)로 변경되었습니다.`);
 }
 
-// 채팅 전송 함수 (미구현 상태, 필요 시 추가 가능)
-async function sendChat() {
-  // 채팅 기능 구현 (필요 시 추가)
-}
-
 // HUD2 토글 함수
 function toggleHud2() {
   const hud2 = document.getElementById("hud-2");
@@ -111,9 +106,11 @@ function sendHud2Chat() {
     if (amount === 23000) {
       resp.innerHTML = `AI: 23,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
         <img src="./QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+      onPaymentComplete(23000); // 결제 완료 시 토큰 생성
     } else if (amount === 16000) {
       resp.innerHTML = `AI: 16,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
         <img src="./QR%20코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+      onPaymentComplete(16000); // 결제 완료 시 토큰 생성
     } else {
       resp.textContent = "AI: 잘못된 결제 금액입니다. 23000 또는 16000을 입력하세요.";
     }
@@ -152,6 +149,55 @@ function showRefundGuide() {
   resp.innerHTML = "AI: 환불 요청을 위해 QR 코드를 이메일로 보내주세요.";
   logEl.appendChild(resp);
   logEl.scrollTop = logEl.scrollHeight;
+}
+
+// 토큰 제출 및 유효성 검사 함수
+async function submitToken() {
+  const token = document.getElementById("token-input").value.trim();
+  if (!token) {
+    alert("토큰을 입력하세요.");
+    return;
+  }
+
+  // 서버에 토큰 유효성 검사 요청 (여기서는 모의로 로컬 검사)
+  const response = await fetch('/validate-token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  }).catch(() => ({ ok: false })); // 서버가 없으면 실패로 처리
+
+  const data = await response.json().catch(() => ({ valid: false }));
+  if (data.valid) {
+    localStorage.setItem('token', token);
+    alert("토큰이 유효합니다. 해제되었습니다.");
+    showSpeechBubbleInChunks("해제되었습니다.");
+    // emotionail.site의 8시간 차단 해제 요청
+    await fetch('http://emotionail.site/unblock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    }).catch(err => console.error("차단 해제 실패:", err));
+  } else {
+    alert("유효하지 않은 토큰입니다.");
+  }
+}
+
+// 결제 완료 시 토큰 생성 함수
+async function onPaymentComplete(amount) {
+  // 서버에 토큰 생성 요청 (여기서는 모의로 클라이언트에서 생성)
+  const response = await fetch('/generate-token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paymentId: `pay-${amount}-${Date.now()}` })
+  }).catch(() => ({ ok: false }));
+
+  const data = await response.json().catch(() => ({ token: null }));
+  const token = data.token || Math.random().toString(36).substr(2, 16); // 서버 없으면 랜덤 토큰 생성
+  const tokenInput = document.getElementById("token-input");
+  if (tokenInput) {
+    tokenInput.value = token; // 토큰 입력창에 자동 입력
+    alert(`결제가 완료되었습니다. 토큰: ${token}`);
+  }
 }
 
 // 날씨 정보 가져오기 함수
