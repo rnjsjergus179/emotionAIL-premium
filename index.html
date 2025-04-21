@@ -119,64 +119,20 @@
       <h2>문의</h2>
       <p>더 궁금한 사항이나 제휴 문의는 아래 이메일로 연락 주시기 바랍니다.</p>
     </section>
-    <!-- 토큰 입력창 추가 (문의 섹션 아래) -->
-    <div id="token-input-container" style="text-align: center; margin: 20px;">
-      <input type="text" id="token-input" placeholder="토큰을 입력하세요" style="padding: 10px; width: 200px;" />
-      <button onclick="submitToken()" style="padding: 10px 20px; margin-left: 10px;">제출</button>
-      <p id="token-error" style="color: red; display: none; margin-top: 10px;">유효하지 않은 토큰입니다.</p>
-    </div>
+    <!-- 토큰 입력창 추가 -->
+    <section id="token-section" class="section">
+      <h2>토큰 입력</h2>
+      <div id="token-input-area">
+        <input type="text" id="token-input" placeholder="토큰 입력..." />
+        <button onclick="submitToken()">제출</button>
+      </div>
+      <p>결제 후 생성된 토큰을 입력하여 8시간 차단을 해제하세요.</p>
+    </section>
   </div>
   <footer>
     <p>© 2025 AI 3D 비서. All rights reserved.</p>
     <p>이메일: rnjsjergus179@gmail.com</p>
   </footer>
-  <script>
-    // 유효한 토큰 목록
-    const validTokens = ["abc123", "qwe456", "zxc789"];
-
-    // 기능 활성화 함수
-    function activateFeatures() {
-      document.querySelectorAll(".section").forEach(section => {
-        section.style.display = "block";
-      });
-      document.getElementById("token-input-container").style.display = "none";
-    }
-
-    // 기능 비활성화 함수
-    function deactivateFeatures() {
-      document.querySelectorAll(".section").forEach(section => {
-        section.style.display = "none";
-      });
-      document.getElementById("token-input-container").style.display = "block";
-      alert("결제가 필요합니다.");
-    }
-
-    // 토큰 확인 함수
-    function checkToken() {
-      const token = localStorage.getItem("token");
-      if (token && validTokens.includes(token)) {
-        activateFeatures();
-      } else {
-        deactivateFeatures();
-      }
-    }
-
-    // 토큰 제출 함수
-    function submitToken() {
-      const token = document.getElementById("token-input").value;
-      if (validTokens.includes(token)) {
-        localStorage.setItem("token", token);
-        document.getElementById("token-error").style.display = "none";
-        activateFeatures();
-      } else {
-        document.getElementById("token-error").style.display = "block";
-      }
-    }
-
-    // 페이지 로드 시 토큰 확인
-    window.onload = checkToken;
-  </script>
   <script src="main.js"></script>
-  <script src="index.js"></script>
 </body>
 </html>
