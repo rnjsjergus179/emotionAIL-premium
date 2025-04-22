@@ -15,9 +15,8 @@ const regionMap = {
 const regionList = Object.keys(regionMap); // 지역 리스트
 
 // 결제 안내 메시지 (HTML 형식)
-const paymentGuideMessage = `AI: 결제 진행 절차를 안내합니다.<br>
-  월 구독은 23,000원, 주간 구독은 16,000원입니다.<br>
-  결제할 금액을 입력하세요 (예: 23000 또는 16000).<br>
+const paymentGuideMessage = `AI: 화면 내리면 이름이랑 이메일을 입력해주세요.<br>
+  16000원을 구독해주세요 화면 내리면 나와있습니다.<br>
   <div class="legal-notice">
     <p><strong>법적 고지:</strong></p>
     <ul>
@@ -79,7 +78,7 @@ function toggleHud2() {
   }
 }
 
-// HUD2 채팅 전송 함수 (QR 코드 표시 포함, 토큰 관련 로직 제거)
+// HUD2 채팅 전송 함수 (QR 코드 관련 로직 제거)
 function sendHud2Chat() {
   const inputEl = document.getElementById("hud-2-input");
   const logEl = document.getElementById("hud-2-log");
@@ -97,20 +96,18 @@ function sendHud2Chat() {
   resp.style.color = "#2575fc";
   const cleanedMsg = msg.replace(/,/g, '');
 
-  if (/환불/.test(msg)) {
-    resp.innerHTML = "AI: 환불 요청을 위해 QR 코드를 이메일로 보내주세요.";
+  if (/구독/.test(msg)) {
+    resp.innerHTML = "AI: 화면 내리면 이름이랑 이메일을 입력해주세요.";
+  } else if (/환불/.test(msg)) {
+    resp.innerHTML = "AI: 환불 요청을 위해 고객센터에 문의해주세요.";
   } else if (msg.includes("결제 진행 절차") || msg.includes("결제 안내")) {
     resp.innerHTML = paymentGuideMessage;
   } else if (/^\d+$/.test(cleanedMsg)) {
     const amount = parseInt(cleanedMsg);
-    if (amount === 23000) {
-      resp.innerHTML = `AI: 23,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="./QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
-    } else if (amount === 16000) {
-      resp.innerHTML = `AI: 16,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
-        <img src="./QR%20코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
+    if (amount === 16000) {
+      resp.innerHTML = `AI: 16000원을 결제하려면 결제 시스템을 통해 진행해주세요.`;
     } else {
-      resp.textContent = "AI: 잘못된 결제 금액입니다. 23000 또는 16000을 입력하세요.";
+      resp.textContent = "AI: 잘못된 결제 금액입니다. 16000을 입력하세요.";
     }
   } else if (msg.startsWith("정보:")) {
     const userInfo = msg.slice(3).trim();
@@ -144,12 +141,12 @@ function showRefundGuide() {
   if (!logEl) return;
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  resp.innerHTML = "AI: 환불 요청을 위해 QR 코드를 이메일로 보내주세요.";
+  resp.innerHTML = "AI: 환불 요청을 위해 고객센터에 문의해주세요.";
   logEl.appendChild(resp);
   logEl.scrollTop = logEl.scrollHeight;
 }
 
-// 이메일 제출 및 구독 등록 함수 (추가됨)
+// 이메일 제출 및 구독 등록 함수
 async function subscribeUser() {
   const nameInput = document.getElementById("name-input");
   const emailInput = document.getElementById("email-input");
@@ -182,7 +179,7 @@ async function subscribeUser() {
   }
 }
 
-// 구독 여부 확인 함수 (추가됨)
+// 구독 여부 확인 함수
 async function checkSubscription() {
   const emailInput = document.getElementById("email-input");
   if (!emailInput) return;
