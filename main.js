@@ -14,14 +14,15 @@ const regionMap = {
 }; // 지역 매핑 객체
 const regionList = Object.keys(regionMap); // 지역 리스트
 
-// 결제 안내 메시지 (HTML 형식, 법적 고지사항만 포함)
+// 결제 안내 메시지 (HTML 형식, 새로운 법적 고지사항 반영)
 const paymentGuideMessage = `<div class="legal-notice">
     <p><strong>법적 고지:</strong></p>
     <ul>
-      <li>이 서비스는 1인 개발자에 의해 운영됩니다.</li>
-      <li>환불은 수동으로 처리되며, 처리에 3~5일이 소요될 수 있습니다.</li>
-      <li>개발자는 이 서비스의 사용으로 인해 발생하는 어떠한 손해 또는 손실에 대해 책임을 지지 않습니다.</li>
+      <li>본 서비스는 1인 개발자에 의해 운영됩니다.</li>
+      <li>해당 후원은 자율 선택이며, 월 16,000원 구독 후에는 환불이 불가합니다.</li>
+      <li>개발자는 이 서비스 사용으로 발생하는 문제에 대해 법적 책임을 지지 않습니다.</li>
     </ul>
+    <p>후원해 주시면 더욱 발전해서 열심히 하겠습니다. 감사합니다. <a href="https://www.buymeacoffee.com/rnjsjergus12" target="_blank">여기를 클릭하세요</a></p>
   </div>`;
 
 // 텍스트를 청크 단위로 말풍선에 표시하는 함수
@@ -92,26 +93,11 @@ function sendHud2Chat() {
 
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  const cleanedMsg = msg.replace(/,/g, '').replace(/원/g, ''); // "원"과 쉼표 제거
 
   if (/환불/.test(msg)) {
     resp.textContent = "AI: 환불 요청을 위해 이메일을 보내주세요.";
   } else if (msg.includes("결제 진행 절차") || msg.includes("결제 안내")) {
     resp.innerHTML = paymentGuideMessage;
-  } else if (/^\d+$/.test(cleanedMsg)) {
-    const amount = parseInt(cleanedMsg);
-    if (amount === 16000) {
-      resp.textContent = "AI: 16,000원 결제를 진행하세요. 결제 후 구독을 완료해 주세요.";
-    } else {
-      resp.textContent = "AI: 잘못된 결제 금액입니다. 16000을 입력하세요.";
-    }
-  } else if (msg.startsWith("정보:")) {
-    const userInfo = msg.slice(3).trim();
-    if (userInfo) {
-      resp.textContent = `AI: 결제 완료가 확인되었습니다. 입력하신 정보: ${userInfo} (감사합니다.)`;
-    } else {
-      resp.textContent = "AI: '정보:' 뒤에 이메일 또는 닉네임을 입력해 주세요.";
-    }
   } else {
     resp.textContent = "AI: 이해하지 못했습니다. 다시 시도해 주세요.";
   }
@@ -140,69 +126,6 @@ function showRefundGuide() {
   resp.textContent = "AI: 환불 요청을 위해 이메일을 보내주세요.";
   logEl.appendChild(resp);
   logEl.scrollTop = logEl.scrollHeight;
-}
-
-// 이메일 제출 및 구독 등록 함수
-async function subscribeUser() {
-  const nameInput = document.getElementById("name-input");
-  const emailInput = document.getElementById("email-input");
-  if (!nameInput || !emailInput) return;
-
-  const name = nameInput.value.trim();
-  const email = emailInput.value.trim();
-
-  if (!name || !email) {
-    alert("이름과 이메일을 입력해주세요.");
-    return;
-  }
-
-  try {
-    const response = await fetch('/api/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email })
-    });
-
-    if (!response.ok) {
-      throw new Error("구독 등록에 실패했습니다.");
-    }
-
-    const data = await response.json();
-    alert(data.message || "구독이 성공적으로 등록되었습니다.");
-  } catch (error) {
-    console.error("구독 등록 중 오류:", error);
-    alert("구독 등록에 실패했습니다.");
-  }
-}
-
-// 구독 여부 확인 함수
-async function checkSubscription() {
-  const emailInput = document.getElementById("email-input");
-  if (!emailInput) return;
-
-  const email = emailInput.value.trim();
-  if (!email) {
-    alert("이메일을 입력해주세요.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`/api/check-subscription?email=${encodeURIComponent(email)}`);
-    if (!response.ok) {
-      throw new Error("구독 여부 확인에 실패했습니다.");
-    }
-
-    const data = await response.json();
-    if (data.subscribed) {
-      const expiresAt = new Date(data.expiresAt).toLocaleDateString();
-      alert(`구독 중입니다. 만료일: ${expiresAt}`);
-    } else {
-      alert("구독하지 않았거나 구독이 만료되었습니다.");
-    }
-  } catch (error) {
-    console.error("구독 여부 확인 중 오류:", error);
-    alert("구독 여부를 확인할 수 없습니다.");
-  }
 }
 
 // 날씨 정보 가져오기 함수
@@ -644,165 +567,4 @@ function initCalendar() {
   if (prevMonthBtn) {
     prevMonthBtn.addEventListener("click", () => {
       currentMonth--;
-      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-      renderCalendar(currentYear, currentMonth);
-    });
-  }
-  if (nextMonthBtn) {
-    nextMonthBtn.addEventListener("click", () => {
-      currentMonth++;
-      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-      renderCalendar(currentYear, currentMonth);
-    });
-  }
-  if (yearSelect) {
-    yearSelect.addEventListener("change", (e) => {
-      currentYear = parseInt(e.target.value);
-      renderCalendar(currentYear, currentMonth);
-    });
-  }
-  if (deleteDayEventBtn) {
-    deleteDayEventBtn.addEventListener("click", () => {
-      const dayStr = prompt("삭제할 하루일정의 날짜(일)를 입력하세요 (예: 15):");
-      if (dayStr) {
-        const dayNum = parseInt(dayStr);
-        const eventDiv = document.getElementById(`event-${currentYear}-${currentMonth+1}-${dayNum}`);
-        if (eventDiv) {
-          eventDiv.textContent = "";
-          alert(`${currentYear}-${currentMonth+1}-${dayNum} 일정이 삭제되었습니다.`);
-        }
-      }
-    });
-  }
-  if (saveCalendarBtn) {
-    saveCalendarBtn.addEventListener("click", () => {
-      saveCalendar();
-    });
-  }
-}
-
-// 연도 선택 옵션 채우기 함수
-function populateYearSelect() {
-  const yearSelect = document.getElementById("year-select");
-  if (!yearSelect) return;
-  yearSelect.innerHTML = "";
-  for (let y = 2020; y <= 2070; y++) {
-    const option = document.createElement("option");
-    option.value = y;
-    option.textContent = y;
-    if (y === currentYear) option.selected = true;
-    yearSelect.appendChild(option);
-  }
-}
-
-// 캘린더 렌더링 함수
-function renderCalendar(year, month) {
-  const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
-  const monthYearLabel = document.getElementById("month-year-label");
-  const grid = document.getElementById("calendar-grid");
-  if (!monthYearLabel || !grid) return;
-
-  monthYearLabel.textContent = `${year}년 ${monthNames[month]}`;
-  grid.innerHTML = "";
-  const daysOfWeek = ["일","월","화","수","목","금","토"];
-  daysOfWeek.forEach(day => {
-    const th = document.createElement("div");
-    th.style.fontWeight = "bold";
-    th.style.textAlign = "center";
-    th.textContent = day;
-    grid.appendChild(th);
-  });
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-  for (let i = 0; i < firstDay; i++) {
-    grid.appendChild(document.createElement("div"));
-  }
-  for (let d = 1; d <= daysInMonth; d++) {
-    const cell = document.createElement("div");
-    cell.innerHTML = `<div class="day-number">${d}</div>
-                      <div class="event" id="event-${year}-${month+1}-${d}"></div>`;
-    cell.addEventListener("click", () => {
-      const eventText = prompt(`${year}-${month+1}-${d} 일정 입력:`);
-      if (eventText) {
-        const eventDiv = document.getElementById(`event-${year}-${month+1}-${d}`);
-        if (eventDiv) {
-          if (eventDiv.textContent) {
-            eventDiv.textContent += "; " + eventText;
-          } else {
-            eventDiv.textContent = eventText;
-          }
-        }
-      }
-    });
-    grid.appendChild(cell);
-  }
-}
-
-// 캘린더 저장 함수
-function saveCalendar() {
-  const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
-  const calendarData = {};
-  for (let d = 1; d <= daysInMonth; d++) {
-    const eventDiv = document.getElementById(`event-${currentYear}-${currentMonth+1}-${d}`);
-    if (eventDiv && eventDiv.textContent.trim() !== "") {
-      calendarData[`${currentYear}-${currentMonth+1}-${d}`] = eventDiv.textContent;
-    }
-  }
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(calendarData, null, 2));
-  const dlAnchorElem = document.createElement("a");
-  dlAnchorElem.setAttribute("href", dataStr);
-  dlAnchorElem.setAttribute("download", "calendar_events.json");
-  dlAnchorElem.style.display = "none";
-  document.body.appendChild(dlAnchorElem);
-  dlAnchorElem.click();
-  document.body.removeChild(dlAnchorElem);
-}
-
-// 튜토리얼 표시 함수
-function showTutorial() {
-  const overlay = document.getElementById("tutorial-overlay");
-  if (!overlay) return;
-  overlay.style.display = "flex";
-  setTimeout(() => { overlay.style.opacity = "1"; }, 10);
-  setTimeout(() => {
-    overlay.style.opacity = "0";
-    setTimeout(() => { overlay.style.display = "none"; }, 1000);
-  }, 4000);
-}
-
-// 버전 변경 함수
-function changeVersion(version) {
-  if (version === "1.3") {
-    window.location.href = window.location.href;
-  } else if (version === "latest") {
-    alert("최신 버전으로 이동하려면 해당 URL을 입력하세요.");
-  }
-}
-
-// DOM 로드 완료 시 실행
-document.addEventListener("DOMContentLoaded", function() {
-  const regionSelect = document.getElementById("region-select");
-  if (regionSelect) {
-    regionList.forEach(region => {
-      const option = document.createElement("option");
-      option.value = region;
-      option.textContent = `${region} (${regionMap[region]})`;
-      if (region === currentCity) option.selected = true;
-      regionSelect.appendChild(option);
-    });
-  }
-  const hud2Toggle = document.getElementById("hud-2-toggle");
-  if (hud2Toggle) {
-    hud2Toggle.addEventListener("click", toggleHud2);
-  }
-});
-
-// 페이지 로드 완료 시 실행
-window.addEventListener("load", async () => {
-  mainInit();
-  initCalendar();
-  showTutorial();
-  updateMap();
-  await updateWeatherAndEffects();
-  onWindowResize();
-});
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(currentYear, currentMonth); }); } if (nextMonthBtn) { nextMonthBtn.addEventListener("click", () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(currentYear, currentMonth); }); } if (yearSelect) { yearSelect.addEventListener("change", (e) => { currentYear = parseInt(e.target.value); renderCalendar(currentYear, currentMonth); }); } if (deleteDayEventBtn) { deleteDayEventBtn.addEventListener("click", () => { const dayStr = prompt("삭제할 하루일정의 날짜(일)를 입력하세요 (예: 15):"); if (dayStr) { const dayNum = parseInt(dayStr); const eventDiv = document.getElementById(`event-${currentYear}-${currentMonth+1}-${dayNum}`); if (eventDiv) { eventDiv.textContent = ""; alert(`${currentYear}-${currentMonth+1}-${dayNum} 일정이 삭제되었습니다.`); } } }); } if (saveCalendarBtn) { saveCalendarBtn.addEventListener("click", () => { saveCalendar(); }); } } // 연도 선택 옵션 채우기 함수 function populateYearSelect() { const yearSelect = document.getElementById("year-select"); if (!yearSelect) return; yearSelect.innerHTML = ""; for (let y = 2020; y <= 2070; y++) { const option = document.createElement("option"); option.value = y; option.textContent = y; if (y === currentYear) option.selected = true; yearSelect.appendChild(option); } } // 캘린더 렌더링 함수 function renderCalendar(year, month) { const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"]; const monthYearLabel = document.getElementById("month-year-label"); const grid = document.getElementById("calendar-grid"); if (!monthYearLabel || !grid) return; monthYearLabel.textContent = `${year}년 ${monthNames[month]}`; grid.innerHTML = ""; const daysOfWeek = ["일","월","화","수","목","금","토"]; daysOfWeek.forEach(day => { const th = document.createElement("div"); th.style.fontWeight = "bold"; th.style.textAlign = "center"; th.textContent = day; grid.appendChild(th); }); const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month+1, 0).getDate(); for (let i = 0; i < firstDay; i++) { grid.appendChild(document.createElement("
