@@ -14,8 +14,8 @@ const regionMap = {
 }; // 지역 매핑 객체
 const regionList = Object.keys(regionMap); // 지역 리스트
 
-// 결제 안내 메시지 (HTML 형식)
-const paymentGuideMessage =  <div class="legal-notice">
+// 결제 안내 메시지 (HTML 형식, 법적 고지사항만 포함)
+const paymentGuideMessage = `<div class="legal-notice">
     <p><strong>법적 고지:</strong></p>
     <ul>
       <li>이 서비스는 1인 개발자에 의해 운영됩니다.</li>
@@ -92,20 +92,18 @@ function sendHud2Chat() {
 
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  const cleanedMsg = msg.replace(/,/g, '');
+  const cleanedMsg = msg.replace(/,/g, '').replace(/원/g, ''); // "원"과 쉼표 제거
 
-  if (/구독/.test(msg)) {
-    resp.innerHTML = "AI: 왼쪽 화면 내리면 이름이랑 이메일이 있습니다.";
-  } else if (/환불/.test(msg)) {
-    resp.innerHTML = "AI: 환불 요청을 위해 이메일로 문의해주세요.";
+  if (/환불/.test(msg)) {
+    resp.textContent = "AI: 환불 요청을 위해 이메일을 보내주세요.";
   } else if (msg.includes("결제 진행 절차") || msg.includes("결제 안내")) {
     resp.innerHTML = paymentGuideMessage;
   } else if (/^\d+$/.test(cleanedMsg)) {
     const amount = parseInt(cleanedMsg);
     if (amount === 16000) {
-      resp.innerHTML = `AI:이름이랑 이메일을써주세요 화면밑에 나와있습니다`;
+      resp.textContent = "AI: 16,000원 결제를 진행하세요. 결제 후 구독을 완료해 주세요.";
     } else {
-      resp.textContent = "AI:16000원을 구독해주세요 화면밑에있습니다.";
+      resp.textContent = "AI: 잘못된 결제 금액입니다. 16000을 입력하세요.";
     }
   } else if (msg.startsWith("정보:")) {
     const userInfo = msg.slice(3).trim();
@@ -139,7 +137,7 @@ function showRefundGuide() {
   if (!logEl) return;
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  resp.innerHTML = "AI: 환불 요청을 위해 이메일로 문의해주세요.";
+  resp.textContent = "AI: 환불 요청을 위해 이메일을 보내주세요.";
   logEl.appendChild(resp);
   logEl.scrollTop = logEl.scrollHeight;
 }
