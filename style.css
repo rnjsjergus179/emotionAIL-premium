@@ -284,18 +284,34 @@ footer { background: #333; color: #fff; text-align: center; padding: 20px; }
 #token-section p {
   text-align: center;
 }
-
 #token-input-area {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px; /* 입력창과 버튼 사이의 간격 */
 }
-
 #token-input {
   width: 200px; /* 입력창의 너비를 고정 */
 }
-
 #token-input-area button {
   padding: 10px 20px; /* 버튼의 패딩을 설정하여 크기 조정 */
+}
+
+/* 구독자 목록 테이블 스타일 */
+#subscriber-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+#subscriber-list th, #subscriber-list td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+#subscriber-list th {
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+#subscriber-list th:hover {
+  background-color: #ddd;
 }
