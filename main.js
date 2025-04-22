@@ -105,9 +105,9 @@ function sendHud2Chat() {
   } else if (/^\d+$/.test(cleanedMsg)) {
     const amount = parseInt(cleanedMsg);
     if (amount === 16000) {
-      resp.innerHTML = `AI: 16000원을 결제하려면 결제 시스템을 통해 진행해주세요.`;
+      resp.innerHTML = `AI:이름이랑 이메일을써주세요 화면밑에 나와있습니다`;
     } else {
-      resp.textContent = "AI: 잘못된 결제 금액입니다. 16000을 입력하세요.";
+      resp.textContent = "AI:16000원을 구독해주세요 화면밑에있습니다.";
     }
   } else if (msg.startsWith("정보:")) {
     const userInfo = msg.slice(3).trim();
