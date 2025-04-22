@@ -25,36 +25,6 @@ const KEYWORDS = {
   delete: ["하루일정 삭제", "하루일과 삭제해줘", "하루일과", "하루일저", "하루 일관"]
 };
 
-// 기능 정지 플래그 및 사용 시간 설정
-const EIGHT_HOURS = 8 * 60 * 60 * 1000; // 8시간 (밀리초 단위)
-let isFunctionDisabled = false;
-
-if (!localStorage.getItem('startTime')) {
-  localStorage.setItem('startTime', Date.now());
-}
-
-function checkUsageTime() {
-  const startTime = parseInt(localStorage.getItem('startTime'), 10);
-  const currentTime = Date.now();
-  if (currentTime - startTime >= EIGHT_HOURS) {
-    disableFunctions();
-  }
-}
-
-setTimeout(() => {
-  disableFunctions();
-  window.location.href = 'http://emotionailpremiumservice.site/';
-}, EIGHT_HOURS);
-
-function disableFunctions() {
-  isFunctionDisabled = true;
-  document.getElementById("chat-input").disabled = true;
-  document.getElementById("region-select").disabled = true;
-  document.getElementById("calendar-grid").style.pointerEvents = 'none';
-  document.getElementById("speech-bubble").style.display = 'none';
-  alert("8시간 사용 제한이 초과되어 모든 기능이 정지되었습니다. 결제 페이지로 이동합니다.");
-}
-
 /***** 전역 변수 *****/
 document.addEventListener("contextmenu", event => event.preventDefault());
 let currentCity = "서울";
@@ -110,7 +80,6 @@ const memoryStorage = {
 };
 
 function updateConversationHistory(input, response) {
-  if (isFunctionDisabled) return;
   try {
     let history = memoryStorage.load("conversationHistory") || [];
     history.push({ timestamp: Date.now(), input: input, response: response });
@@ -121,7 +90,6 @@ function updateConversationHistory(input, response) {
 }
 
 function learnFromInteractions() {
-  if (isFunctionDisabled) return;
   let history = memoryStorage.load("conversationHistory") || [];
   let emotionCount = memoryStorage.load("emotionCount") || { positive: 0, negative: 0, surprise: 0 };
   if (emotionCount["negative"] && emotionCount["negative"] >= 5) {
@@ -134,7 +102,6 @@ function learnFromInteractions() {
 /***** NLP (감정 분석) + 의도 인식 + 뉴스 파이프라인 *****/
 let lastTopic = memoryStorage.load("lastTopic") || "";
 function processNLP(input) {
-  if (isFunctionDisabled) return null;
   const lowerInput = input.toLowerCase();
   const emotions = {
     positive: ["좋아", "행복", "기쁘", "즐거", "최고"],
@@ -181,7 +148,6 @@ const intents = {
 };
 
 function detectIntent(input) {
-  if (isFunctionDisabled) return null;
   const lowerInput = input.toLowerCase();
   for (let intent in intents) {
     if (intents[intent].some(keyword => lowerInput.includes(keyword))) {
@@ -192,13 +158,11 @@ function detectIntent(input) {
 }
 
 function isNewsQuery(input) {
-  if (isFunctionDisabled) return false;
   const newsKeywords = ["뉴스", "속보", "보도", "언론", "이슈", "사건", "정치", "사회", "경제"];
   return newsKeywords.some(keyword => input.includes(keyword));
 }
 
 async function pipelineNewsSearch(userInput) {
-  if (isFunctionDisabled) return;
   let query = userInput;
   if (isNewsQuery(userInput)) {
     query += " site:news.google.com OR site:n.news.naver.com";
@@ -210,7 +174,6 @@ async function pipelineNewsSearch(userInput) {
 
 /***** 음성 출력 *****/
 function speakText(text) {
-  if (isFunctionDisabled) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "ko-KR";
   utterance.volume = 1;
@@ -221,7 +184,6 @@ function speakText(text) {
 
 /***** 캘린더 관련 함수 *****/
 function deleteCalendarEvent(day) {
-  if (isFunctionDisabled) return "기능이 정지되었습니다.";
   const eventDiv = document.getElementById(`event-${currentYear}-${currentMonth+1}-${day}`);
   if (eventDiv) {
     eventDiv.textContent = "";
@@ -235,7 +197,6 @@ function deleteCalendarEvent(day) {
 }
 
 function getCalendarEvents(dateStr = null) {
-  if (isFunctionDisabled) return "기능이 정지되었습니다.";
   const calendarData = JSON.parse(localStorage.getItem("calendarEvents") || "{}");
   if (!Object.keys(calendarData).length) {
     return "저장된 일정이 없습니다. 먼저 날짜 셀을 클릭하여 일정을 입력해주세요.";
@@ -260,7 +221,6 @@ function getCalendarEvents(dateStr = null) {
 }
 
 function updateMap() {
-  if (isFunctionDisabled) return;
   const englishCity = regionMap[currentCity] || "Seoul";
   document.getElementById("map-iframe").src = `https://www.google.com/maps?q=${encodeURIComponent(englishCity)}&output=embed`;
 }
@@ -269,7 +229,6 @@ function updateMap() {
 const BACKEND_URL = 'https://your-backend.onrender.com'; // 실제 Render URL로 교체 필요
 
 async function getWeather() {
-  if (isFunctionDisabled) return { message: "기능이 정지되었습니다." };
   try {
     const englishCity = regionMap[currentCity] || "Seoul";
     const response = await fetch(`${BACKEND_URL}/api/weather?city=${encodeURIComponent(englishCity)}`);
@@ -286,7 +245,6 @@ async function getWeather() {
 }
 
 async function getGoogleSearchResults(query) {
-  if (isFunctionDisabled) return "기능이 정지되었습니다.";
   try {
     const response = await fetch(`${BACKEND_URL}/api/search?q=${encodeURIComponent(query)}`);
     if (!response.ok) throw new Error("서버 응답 오류");
@@ -303,7 +261,6 @@ async function getGoogleSearchResults(query) {
 }
 
 async function getYouTubeSearchResults(query) {
-  if (isFunctionDisabled) return "기능이 정지되었습니다.";
   try {
     const response = await fetch(`${BACKEND_URL}/api/youtube-search?q=${encodeURIComponent(query)}`);
     if (!response.ok) throw new Error("서버 응답 오류");
@@ -325,7 +282,6 @@ async function getYouTubeSearchResults(query) {
 }
 
 function updateWeatherEffects() {
-  if (isFunctionDisabled) return;
   if (!currentWeather) return;
   if (currentWeather.includes("비") || currentWeather.includes("소나기")) {
     rainGroup.visible = true;
@@ -342,7 +298,6 @@ function updateWeatherEffects() {
 }
 
 function updateLightning() {
-  if (isFunctionDisabled) return;
   if (currentWeather.includes("번개") || currentWeather.includes("뇌우")) {
     if (Math.random() < 0.001) {
       lightningLight.intensity = 5;
@@ -352,7 +307,6 @@ function updateLightning() {
 }
 
 async function updateWeatherAndEffects(sendMessage = true) {
-  if (isFunctionDisabled) return;
   const weatherData = await getWeather();
   if (sendMessage) {
     showSpeechBubbleInChunks(weatherData.message);
@@ -361,7 +315,6 @@ async function updateWeatherAndEffects(sendMessage = true) {
 }
 
 function changeRegion(value) {
-  if (isFunctionDisabled) return;
   currentCity = value;
   updateMap();
   updateWeatherAndEffects();
@@ -372,7 +325,6 @@ function changeRegion(value) {
 
 /***** 음성 인식 *****/
 function startSpeechRecognition() {
-  if (isFunctionDisabled) return;
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     alert("이 브라우저는 음성 인식을 지원하지 않습니다.");
@@ -397,14 +349,12 @@ function startSpeechRecognition() {
 
 /***** 대화 맥락 유지 및 의도 인식 *****/
 function updateContext(intent) {
-  if (isFunctionDisabled) return;
   lastTopic = intent;
   memoryStorage.save("lastTopic", lastTopic);
 }
 
 /***** 채팅 전송 및 파이프라인 처리 *****/
 async function sendChat() {
-  if (isFunctionDisabled) return;
   const inputEl = document.getElementById("chat-input");
   const input = inputEl.value.trim();
   if (!input) return;
@@ -560,7 +510,6 @@ async function sendChat() {
 
 /***** 말풍선(버블) 여러 줄 출력 *****/
 function showSpeechBubbleInChunks(text, isHTML = false, chunkSize = 15, delay = 1500) {
-  if (isFunctionDisabled) return;
   const bubble = document.getElementById("speech-bubble");
   let parts;
   if (isHTML) {
@@ -596,7 +545,6 @@ function showSpeechBubbleInChunks(text, isHTML = false, chunkSize = 15, delay = 
 
 /***** DOMContentLoaded, resize, load 이벤트 *****/
 window.addEventListener("DOMContentLoaded", function() {
-  if (isFunctionDisabled) return;
   const chatInput = document.getElementById("chat-input");
   chatInput.setAttribute("list", "Charge");
   const autoCompleteList = document.createElement("datalist");
@@ -622,14 +570,12 @@ window.addEventListener("DOMContentLoaded", function() {
 });
 
 window.addEventListener("resize", function(){
-  if (isFunctionDisabled) return;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
 window.addEventListener("load", async () => {
-  if (isFunctionDisabled) return;
   initCalendar();
   updateMap();
   await updateWeatherAndEffects();
@@ -638,7 +584,6 @@ window.addEventListener("load", async () => {
 /***** 캘린더 렌더링 *****/
 let currentYear, currentMonth;
 function initCalendar() {
-  if (isFunctionDisabled) return;
   const now = new Date();
   currentYear = now.getFullYear();
   currentMonth = now.getMonth();
@@ -677,7 +622,6 @@ function initCalendar() {
 }
 
 function populateYearSelect() {
-  if (isFunctionDisabled) return;
   const yearSelect = document.getElementById("year-select");
   yearSelect.innerHTML = "";
   for (let y = 2020; y <= 2070; y++) {
@@ -690,7 +634,6 @@ function populateYearSelect() {
 }
 
 function renderCalendar(year, month) {
-  if (isFunctionDisabled) return;
   const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
   document.getElementById("month-year-label").textContent = `${year}년 ${monthNames[month]}`;
   const grid = document.getElementById("calendar-grid");
@@ -728,7 +671,7 @@ function renderCalendar(year, month) {
         speakText(`${year}-${month+1}-${d}에 ${eventText} 일정이 추가되었습니다.`);
         let calendarData = JSON.parse(localStorage.getItem("calendarEvents") || "{}");
         calendarData[`${year}-${month+1}-${d}`] = eventDiv.textContent;
-        localStorage.set institutes("calendarEvents", JSON.stringify(calendarData));
+        localStorage.setItem("calendarEvents", JSON.stringify(calendarData));
       }
     });
     let calendarData = JSON.parse(localStorage.getItem("calendarEvents") || "{}");
@@ -984,7 +927,6 @@ cloudRainGroup.visible = false;
 houseCloudGroup.add(cloudRainGroup);
 
 function updateHouseClouds() {
-  if (isFunctionDisabled) return;
   if (typeof head === 'undefined' || head === null || typeof head.getWorldPosition !== "function") return;
   const headWorldPos = new THREE.Vector3();
   try {
@@ -1085,11 +1027,10 @@ for (let i = 0; i < 10; i++) {
 
 function animate() {
   requestAnimationFrame(animate);
-  if (isFunctionDisabled) return;
   const now = new Date();
   const headWorldPos = new THREE.Vector3();
   try {
-    head.getWorldPosition(headWorldPos);
+    head.getWorldPositiothn(headWorldPos);
   } catch (err) {
     console.error("애니메이트 중 head.getWorldPosition 에러:", err);
   }
@@ -1182,7 +1123,6 @@ function animate() {
 animate();
 
 function updateBubblePosition() {
-  if (isFunctionDisabled) return;
   const bubble = document.getElementById("speech-bubble");
   if (!bubble) return;
   if (typeof head === 'undefined' || head === null || typeof head.getWorldPosition !== "function") return;
