@@ -15,8 +15,7 @@ const regionMap = {
 const regionList = Object.keys(regionMap); // 지역 리스트
 
 // 결제 안내 메시지 (HTML 형식)
-const paymentGuideMessage = 
-  <div class="legal-notice">
+const paymentGuideMessage =  <div class="legal-notice">
     <p><strong>법적 고지:</strong></p>
     <ul>
       <li>이 서비스는 1인 개발자에 의해 운영됩니다.</li>
