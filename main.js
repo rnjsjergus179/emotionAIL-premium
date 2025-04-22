@@ -15,8 +15,7 @@ const regionMap = {
 const regionList = Object.keys(regionMap); // 지역 리스트
 
 // 결제 안내 메시지 (HTML 형식)
-const paymentGuideMessage = `AI: 화면 내리면 이름이랑 이메일을 입력해주세요.<br>
-  16000원을 구독해주세요 화면 내리면 나와있습니다.<br>
+const paymentGuideMessage = 
   <div class="legal-notice">
     <p><strong>법적 고지:</strong></p>
     <ul>
@@ -97,9 +96,9 @@ function sendHud2Chat() {
   const cleanedMsg = msg.replace(/,/g, '');
 
   if (/구독/.test(msg)) {
-    resp.innerHTML = "AI: 화면 내리면 이름이랑 이메일을 입력해주세요.";
+    resp.innerHTML = "AI: 왼쪽 화면 내리면 이름이랑 이메일이 있습니다.";
   } else if (/환불/.test(msg)) {
-    resp.innerHTML = "AI: 환불 요청을 위해 고객센터에 문의해주세요.";
+    resp.innerHTML = "AI: 환불 요청을 위해 이메일로 문의해주세요.";
   } else if (msg.includes("결제 진행 절차") || msg.includes("결제 안내")) {
     resp.innerHTML = paymentGuideMessage;
   } else if (/^\d+$/.test(cleanedMsg)) {
@@ -141,7 +140,7 @@ function showRefundGuide() {
   if (!logEl) return;
   const resp = document.createElement("p");
   resp.style.color = "#2575fc";
-  resp.innerHTML = "AI: 환불 요청을 위해 고객센터에 문의해주세요.";
+  resp.innerHTML = "AI: 환불 요청을 위해 이메일로 문의해주세요.";
   logEl.appendChild(resp);
   logEl.scrollTop = logEl.scrollHeight;
 }
