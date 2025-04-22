@@ -79,7 +79,7 @@ function toggleHud2() {
   }
 }
 
-// HUD2 채팅 전송 함수 (QR 코드 표시 포함)
+// HUD2 채팅 전송 함수 (QR 코드 표시 포함, 토큰 관련 로직 제거)
 function sendHud2Chat() {
   const inputEl = document.getElementById("hud-2-input");
   const logEl = document.getElementById("hud-2-log");
@@ -106,11 +106,9 @@ function sendHud2Chat() {
     if (amount === 23000) {
       resp.innerHTML = `AI: 23,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
         <img src="./QR코드.jpg" alt="QR Code for 23000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
-      onPaymentComplete(23000); // 결제 완료 시 토큰 생성
     } else if (amount === 16000) {
       resp.innerHTML = `AI: 16,000원을 결제하려면 다음 QR 코드를 스캔하세요.<br>
         <img src="./QR%20코드.jpg" alt="QR Code for 16000" style="width: 80%; margin-top: 10px; border-radius: 8px;">`;
-      onPaymentComplete(16000); // 결제 완료 시 토큰 생성
     } else {
       resp.textContent = "AI: 잘못된 결제 금액입니다. 23000 또는 16000을 입력하세요.";
     }
@@ -151,52 +149,66 @@ function showRefundGuide() {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
-// 토큰 제출 및 유효성 검사 함수
-async function submitToken() {
-  const token = document.getElementById("token-input").value.trim();
-  if (!token) {
-    alert("토큰을 입력하세요.");
+// 이메일 제출 및 구독 등록 함수 (추가됨)
+async function subscribeUser() {
+  const nameInput = document.getElementById("name-input");
+  const emailInput = document.getElementById("email-input");
+  if (!nameInput || !emailInput) return;
+
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+
+  if (!name || !email) {
+    alert("이름과 이메일을 입력해주세요.");
     return;
   }
 
-  // 서버에 토큰 유효성 검사 요청 (여기서는 모의로 로컬 검사)
-  const response = await fetch('/validate-token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token })
-  }).catch(() => ({ ok: false })); // 서버가 없으면 실패로 처리
-
-  const data = await response.json().catch(() => ({ valid: false }));
-  if (data.valid) {
-    localStorage.setItem('token', token);
-    alert("토큰이 유효합니다. 해제되었습니다.");
-    showSpeechBubbleInChunks("해제되었습니다.");
-    // emotionail.site의 8시간 차단 해제 요청
-    await fetch('http://emotionail.site/unblock', {
+  try {
+    const response = await fetch('/api/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token })
-    }).catch(err => console.error("차단 해제 실패:", err));
-  } else {
-    alert("유효하지 않은 토큰입니다.");
+      body: JSON.stringify({ name, email })
+    });
+
+    if (!response.ok) {
+      throw new Error("구독 등록에 실패했습니다.");
+    }
+
+    const data = await response.json();
+    alert(data.message || "구독이 성공적으로 등록되었습니다.");
+  } catch (error) {
+    console.error("구독 등록 중 오류:", error);
+    alert("구독 등록에 실패했습니다.");
   }
 }
 
-// 결제 완료 시 토큰 생성 함수
-async function onPaymentComplete(amount) {
-  // 서버에 토큰 생성 요청 (여기서는 모의로 클라이언트에서 생성)
-  const response = await fetch('/generate-token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ paymentId: `pay-${amount}-${Date.now()}` })
-  }).catch(() => ({ ok: false }));
+// 구독 여부 확인 함수 (추가됨)
+async function checkSubscription() {
+  const emailInput = document.getElementById("email-input");
+  if (!emailInput) return;
 
-  const data = await response.json().catch(() => ({ token: null }));
-  const token = data.token || Math.random().toString(36).substr(2, 16); // 서버 없으면 랜덤 토큰 생성
-  const tokenInput = document.getElementById("token-input");
-  if (tokenInput) {
-    tokenInput.value = token; // 토큰 입력창에 자동 입력
-    alert(`결제가 완료되었습니다. 토큰: ${token}`);
+  const email = emailInput.value.trim();
+  if (!email) {
+    alert("이메일을 입력해주세요.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/check-subscription?email=${encodeURIComponent(email)}`);
+    if (!response.ok) {
+      throw new Error("구독 여부 확인에 실패했습니다.");
+    }
+
+    const data = await response.json();
+    if (data.subscribed) {
+      const expiresAt = new Date(data.expiresAt).toLocaleDateString();
+      alert(`구독 중입니다. 만료일: ${expiresAt}`);
+    } else {
+      alert("구독하지 않았거나 구독이 만료되었습니다.");
+    }
+  } catch (error) {
+    console.error("구독 여부 확인 중 오류:", error);
+    alert("구독 여부를 확인할 수 없습니다.");
   }
 }
 
