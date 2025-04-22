@@ -239,7 +239,7 @@ for (let i = 0; i < 200; i++) {
     new THREE.SphereGeometry(0.03, 8, 8),
     new THREE.MeshBasicMaterial({ color: 0xffffff })
   );
-  star.position.set((Math.random()-0.5)*100, (Math.random()-0.5)*60, -20);
+  star.position.set((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 60, -20);
   scene.add(star);
   stars.push(star);
 }
@@ -250,7 +250,7 @@ for (let i = 0; i < 60; i++) {
     new THREE.SphereGeometry(0.05, 8, 8),
     new THREE.MeshBasicMaterial({ color: 0xffff99 })
   );
-  firefly.position.set((Math.random()-0.5)*40, (Math.random()-0.5)*20, -10);
+  firefly.position.set((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 20, -10);
   scene.add(firefly);
   fireflies.push(firefly);
 }
@@ -259,7 +259,7 @@ for (let i = 0; i < 60; i++) {
 const floorGeometry = new THREE.PlaneGeometry(400, 400, 128, 128);
 const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 1, metalness: 0 });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-floor.rotation.x = -Math.PI/2;
+floor.rotation.x = -Math.PI / 2;
 floor.position.y = -2;
 scene.add(floor);
 
@@ -276,15 +276,15 @@ function createBuilding(width, height, depth, color) {
   group.add(building);
   const windowMat = new THREE.MeshStandardMaterial({ color: 0x87CEEB });
   for (let y = 3; y < height - 1; y += 2) {
-    for (let x = -width/2 + 0.5; x < width/2; x += 1) {
+    for (let x = -width / 2 + 0.5; x < width / 2; x += 1) {
       const w = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.8, 0.1), windowMat);
-      w.position.set(x, y - height/2, depth/2 + 0.01);
+      w.position.set(x, y - height / 2, depth / 2 + 0.01);
       group.add(w);
     }
   }
   const doorMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
   const door = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 0.1), doorMat);
-  door.position.set(0, -height/2 + 1, depth/2 + 0.01);
+  door.position.set(0, -height / 2 + 1, depth / 2 + 0.01);
   group.add(door);
   return group;
 }
@@ -299,7 +299,7 @@ for (let i = 0; i < 20; i++) {
   const row = Math.floor(i / 10);
   const x = -50 + col * 10;
   const z = -30 - row * 20;
-  building.position.set(x, -2 + h/2, z);
+  building.position.set(x, -2 + h / 2, z);
   backgroundGroup.add(building);
 }
 
@@ -310,24 +310,24 @@ function createHouse(width, height, depth, baseColor, roofColor) {
     new THREE.BoxGeometry(width, height, depth),
     new THREE.MeshStandardMaterial({ color: baseColor, roughness: 0.8 })
   );
-  base.position.y = -2 + height/2;
+  base.position.y = -2 + height / 2;
   group.add(base);
   const roof = new THREE.Mesh(
     new THREE.ConeGeometry(width * 0.8, height * 0.6, 4),
     new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.8 })
   );
-  roof.position.y = -2 + height + (height * 0.6)/2;
-  roof.rotation.y = Math.PI/4;
+  roof.position.y = -2 + height + (height * 0.6) / 2;
+  roof.rotation.y = Math.PI / 4;
   group.add(roof);
   const windowMat = new THREE.MeshStandardMaterial({ color: 0xFFFFE0 });
   const window1 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), windowMat);
-  window1.position.set(-width/4, -2 + height/2, depth/2 + 0.01);
+  window1.position.set(-width / 4, -2 + height / 2, depth / 2 + 0.01);
   const window2 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), windowMat);
-  window2.position.set(width/4, -2 + height/2, depth/2 + 0.01);
+  window2.position.set(width / 4, -2 + height / 2, depth / 2 + 0.01);
   group.add(window1, window2);
   const doorMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
   const door = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 0.1), doorMat);
-  door.position.set(0, -2 + height/4, depth/2 + 0.01);
+  door.position.set(0, -2 + height / 4, depth / 2 + 0.01);
   group.add(door);
   return group;
 }
@@ -567,4 +567,165 @@ function initCalendar() {
   if (prevMonthBtn) {
     prevMonthBtn.addEventListener("click", () => {
       currentMonth--;
-      if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(currentYear, currentMonth); }); } if (nextMonthBtn) { nextMonthBtn.addEventListener("click", () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(currentYear, currentMonth); }); } if (yearSelect) { yearSelect.addEventListener("change", (e) => { currentYear = parseInt(e.target.value); renderCalendar(currentYear, currentMonth); }); } if (deleteDayEventBtn) { deleteDayEventBtn.addEventListener("click", () => { const dayStr = prompt("삭제할 하루일정의 날짜(일)를 입력하세요 (예: 15):"); if (dayStr) { const dayNum = parseInt(dayStr); const eventDiv = document.getElementById(`event-${currentYear}-${currentMonth+1}-${dayNum}`); if (eventDiv) { eventDiv.textContent = ""; alert(`${currentYear}-${currentMonth+1}-${dayNum} 일정이 삭제되었습니다.`); } } }); } if (saveCalendarBtn) { saveCalendarBtn.addEventListener("click", () => { saveCalendar(); }); } } // 연도 선택 옵션 채우기 함수 function populateYearSelect() { const yearSelect = document.getElementById("year-select"); if (!yearSelect) return; yearSelect.innerHTML = ""; for (let y = 2020; y <= 2070; y++) { const option = document.createElement("option"); option.value = y; option.textContent = y; if (y === currentYear) option.selected = true; yearSelect.appendChild(option); } } // 캘린더 렌더링 함수 function renderCalendar(year, month) { const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"]; const monthYearLabel = document.getElementById("month-year-label"); const grid = document.getElementById("calendar-grid"); if (!monthYearLabel || !grid) return; monthYearLabel.textContent = `${year}년 ${monthNames[month]}`; grid.innerHTML = ""; const daysOfWeek = ["일","월","화","수","목","금","토"]; daysOfWeek.forEach(day => { const th = document.createElement("div"); th.style.fontWeight = "bold"; th.style.textAlign = "center"; th.textContent = day; grid.appendChild(th); }); const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month+1, 0).getDate(); for (let i = 0; i < firstDay; i++) { grid.appendChild(document.createElement("
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      renderCalendar(currentYear, currentMonth);
+    });
+  }
+  if (nextMonthBtn) {
+    nextMonthBtn.addEventListener("click", () => {
+      currentMonth++;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      renderCalendar(currentYear, currentMonth);
+    });
+  }
+  if (yearSelect) {
+    yearSelect.addEventListener("change", (e) => {
+      currentYear = parseInt(e.target.value);
+      renderCalendar(currentYear, currentMonth);
+    });
+  }
+  if (deleteDayEventBtn) {
+    deleteDayEventBtn.addEventListener("click", () => {
+      const dayStr = prompt("삭제할 하루일정의 날짜(일)를 입력하세요 (예: 15):");
+      if (dayStr) {
+        const dayNum = parseInt(dayStr);
+        const eventDiv = document.getElementById(`event-${currentYear}-${currentMonth + 1}-${dayNum}`);
+        if (eventDiv) {
+          eventDiv.textContent = "";
+          alert(`${currentYear}-${currentMonth + 1}-${dayNum} 일정이 삭제되었습니다.`);
+        }
+      }
+    });
+  }
+  if (saveCalendarBtn) {
+    saveCalendarBtn.addEventListener("click", () => {
+      saveCalendar();
+    });
+  }
+}
+
+// 연도 선택 옵션 채우기 함수
+function populateYearSelect() {
+  const yearSelect = document.getElementById("year-select");
+  if (!yearSelect) return;
+  yearSelect.innerHTML = "";
+  for (let y = 2020; y <= 2070; y++) {
+    const option = document.createElement("option");
+    option.value = y;
+    option.textContent = y;
+    if (y === currentYear) option.selected = true;
+    yearSelect.appendChild(option);
+  }
+}
+
+// 캘린더 렌더링 함수
+function renderCalendar(year, month) {
+  const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+  const monthYearLabel = document.getElementById("month-year-label");
+  const grid = document.getElementById("calendar-grid");
+  if (!monthYearLabel || !grid) return;
+
+  monthYearLabel.textContent = `${year}년 ${monthNames[month]}`;
+  grid.innerHTML = "";
+  const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
+  daysOfWeek.forEach(day => {
+    const th = document.createElement("div");
+    th.style.fontWeight = "bold";
+    th.style.textAlign = "center";
+    th.textContent = day;
+    grid.appendChild(th);
+  });
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  for (let i = 0; i < firstDay; i++) {
+    grid.appendChild(document.createElement("div"));
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cell = document.createElement("div");
+    cell.innerHTML = `<div class="day-number">${d}</div>
+                      <div class="event" id="event-${year}-${month + 1}-${d}"></div>`;
+    cell.addEventListener("click", () => {
+      const eventText = prompt(`${year}-${month + 1}-${d} 일정 입력:`);
+      if (eventText) {
+        const eventDiv = document.getElementById(`event-${year}-${month + 1}-${d}`);
+        if (eventDiv) {
+          if (eventDiv.textContent) {
+            eventDiv.textContent += "; " + eventText;
+          } else {
+            eventDiv.textContent = eventText;
+          }
+        }
+      }
+    });
+    grid.appendChild(cell);
+  }
+}
+
+// 캘린더 저장 함수
+function saveCalendar() {
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const calendarData = {};
+  for (let d = 1; d <= daysInMonth; d++) {
+    const eventDiv = document.getElementById(`event-${currentYear}-${currentMonth + 1}-${d}`);
+    if (eventDiv && eventDiv.textContent.trim() !== "") {
+      calendarData[`${currentYear}-${currentMonth + 1}-${d}`] = eventDiv.textContent;
+    }
+  }
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(calendarData, null, 2));
+  const dlAnchorElem = document.createElement("a");
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "calendar_events.json");
+  dlAnchorElem.style.display = "none";
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  document.body.removeChild(dlAnchorElem);
+}
+
+// 튜토리얼 표시 함수
+function showTutorial() {
+  const overlay = document.getElementById("tutorial-overlay");
+  if (!overlay) return;
+  overlay.style.display = "flex";
+  setTimeout(() => { overlay.style.opacity = "1"; }, 10);
+  setTimeout(() => {
+    overlay.style.opacity = "0";
+    setTimeout(() => { overlay.style.display = "none"; }, 1000);
+  }, 4000);
+}
+
+// 버전 변경 함수
+function changeVersion(version) {
+  if (version === "1.3") {
+    window.location.href = window.location.href;
+  } else if (version === "latest") {
+    alert("최신 버전으로 이동하려면 해당 URL을 입력하세요.");
+  }
+}
+
+// DOM 로드 완료 시 실행
+document.addEventListener("DOMContentLoaded", function() {
+  const regionSelect = document.getElementById("region-select");
+  if (regionSelect) {
+    regionList.forEach(region => {
+      const option = document.createElement("option");
+      option.value = region;
+      option.textContent = `${region} (${regionMap[region]})`;
+      if (region === currentCity) option.selected = true;
+      regionSelect.appendChild(option);
+    });
+  }
+  const hud2Toggle = document.getElementById("hud-2-toggle");
+  if (hud2Toggle) {
+    hud2Toggle.addEventListener("click", toggleHud2);
+  }
+});
+
+// 페이지 로드 완료 시 실행
+window.addEventListener("load", async () => {
+  mainInit();
+  initCalendar();
+  showTutorial();
+  updateMap();
+  await updateWeatherAndEffects();
+  onWindowResize();
+});
