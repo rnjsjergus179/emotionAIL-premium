@@ -315,3 +315,19 @@ footer { background: #333; color: #fff; text-align: center; padding: 20px; }
 #subscriber-list th:hover {
   background-color: #ddd;
 }
+
+/* 구독 관리 섹션 가운데 정렬 */
+#subscription div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* 요소들 사이의 간격 */
+}
+
+/* 문의 섹션 이메일 입력 및 버튼 가운데 정렬 */
+#email-input-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* 입력창과 버튼 사이의 간격 */
+}
