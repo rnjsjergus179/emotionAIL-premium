@@ -1,5 +1,4 @@
 // 전역 변수 및 상수 정의
-let blockUntil = 0; // 복사 차단 시간
 let danceInterval; // 춤 애니메이션 인터벌 (현재 사용되지 않음)
 let currentCity = "서울"; // 현재 선택된 도시
 let currentWeather = ""; // 현재 날씨 상태
@@ -47,15 +46,12 @@ function showSpeechBubbleInChunks(text, chunkSize = 15, delay = 3000) {
   showNextChunk();
 }
 
-// 복사 방지 및 API 키 숨김 기능
+// 복사 방지 및 API 키 숨김 기능 (복사 차단 시간 제거)
 document.addEventListener("copy", function(e) {
   e.preventDefault();
   let selectedText = window.getSelection().toString();
   selectedText = selectedText.replace(/2caa7fa4a66f2f8d150f1da93d306261/g, "HIDDEN"); // API 키 숨김
   e.clipboardData.setData("text/plain", selectedText);
-  if (Date.now() < blockUntil) return;
-  blockUntil = Date.now() + 3600000; // 1시간 차단
-  showSpeechBubbleInChunks("1시간 동안 차단됩니다.");
 });
 
 // 지역 변경 함수
@@ -729,4 +725,3 @@ window.addEventListener("load", async () => {
   await updateWeatherAndEffects();
   onWindowResize();
 });
-
