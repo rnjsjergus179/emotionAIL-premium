@@ -19,7 +19,7 @@ const paymentGuideMessage = `<div class="legal-notice">
     <p><strong>법적 고지:</strong></p>
     <ul>
       <li>본 서비스는 1인 개발자에 의해 운영됩니다.</li>
-      <li>해당 후원은 자율 선택이며, 월 16,000원 구독 후에는 환불이 불가합니다.</li>
+      <li>해당 후원은 자율 선택이며 일회성 후원 16,000원이며, 환불이 불가합니다.</li>
       <li>개발자는 이 서비스 사용으로 발생하는 문제에 대해 법적 책임을 지지 않습니다.</li>
     </ul>
     <p>후원해 주시면 더욱 발전해서 열심히 하겠습니다. 감사합니다. <a href="https://www.buymeacoffee.com/rnjsjergus12" target="_blank">여기를 클릭하세요</a></p>
@@ -729,3 +729,4 @@ window.addEventListener("load", async () => {
   await updateWeatherAndEffects();
   onWindowResize();
 });
+
